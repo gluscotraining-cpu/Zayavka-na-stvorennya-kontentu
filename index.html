@@ -319,20 +319,27 @@
             </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr;gap:12px;">
-            <div onclick="loadOrders('Скасована')" style="position:relative;overflow:hidden;border-radius:18px;padding:20px 16px;cursor:pointer;background:linear-gradient(135deg,rgba(239,68,68,0.15) 0%,rgba(239,68,68,0.04) 100%);border:1px solid rgba(239,68,68,0.22);transition:transform 0.15s;"
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <div onclick="loadOrders('Скасована')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(239,68,68,0.15) 0%,rgba(239,68,68,0.04) 100%);border:1px solid rgba(239,68,68,0.22);transition:transform 0.15s;"
                 onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-                <div style="width:42px;height:42px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px;">❌</div>
-                <div id="menu-stat-cancel" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f87171;line-height:1;margin-bottom:4px;">—</div>
-                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#f87171;margin-bottom:2px;">Скасовані</div>
-                <div style="font-size:10px;color:rgba(248,113,113,0.5);">Відхилені</div>
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">❌</div>
+                <div id="menu-stat-cancel" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#f87171;line-height:1;margin-bottom:3px;">—</div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#f87171;margin-bottom:2px;">Скасовані</div>
+                <div style="font-size:9px;color:rgba(248,113,113,0.5);">Відхилені</div>
             </div>
-            <div onclick="loadOrders('Архів')" style="position:relative;overflow:hidden;border-radius:18px;padding:20px 16px;cursor:pointer;background:linear-gradient(135deg,rgba(16,185,129,0.13) 0%,rgba(16,185,129,0.03) 100%);border:1px solid rgba(16,185,129,0.2);transition:transform 0.15s;"
+            <div onclick="loadOrders('Виконані')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(16,185,129,0.13) 0%,rgba(16,185,129,0.03) 100%);border:1px solid rgba(16,185,129,0.2);transition:transform 0.15s;"
                 onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-                <div style="width:42px;height:42px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px;">✅</div>
-                <div id="menu-stat-archive" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#34d399;line-height:1;margin-bottom:4px;">—</div>
-                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#34d399;margin-bottom:2px;">Виконані</div>
-                <div style="font-size:10px;color:rgba(52,211,153,0.5);">Завершені</div>
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">✅</div>
+                <div id="menu-stat-completed" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#34d399;line-height:1;margin-bottom:3px;">—</div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#34d399;margin-bottom:2px;">Виконані</div>
+                <div style="font-size:9px;color:rgba(52,211,153,0.5);">Завершені</div>
+            </div>
+            <div onclick="loadOrders('Архів')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(59,130,246,0.13) 0%,rgba(59,130,246,0.03) 100%);border:1px solid rgba(59,130,246,0.2);transition:transform 0.15s;"
+                onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">📦</div>
+                <div id="menu-stat-archive" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#60a5fa;line-height:1;margin-bottom:3px;">—</div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:2px;">Архів</div>
+                <div style="font-size:9px;color:rgba(96,165,250,0.5);">В архіві</div>
             </div>
         </div>
     </div>
@@ -1139,7 +1146,7 @@
             showPage('page-2'); return;
         }
 
-        const titles = { 'Активна':'Активні', 'Скасована':'Скасовані', 'Архів':'Виконані' };
+        const titles = { 'Активна':'Активні', 'Скасована':'Скасовані', 'Виконані':'Виконані', 'Архів':'Архів' };
         document.getElementById('orders-list-title').textContent = titles[statusFilter] || statusFilter;
         showPage('page-orders-list');
         document.getElementById('orders-loading').classList.remove('hidden');
@@ -1192,7 +1199,12 @@
                             </div>`;
                     } else {
                         extra = `
-                            <button onclick="openOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})" class="btn-primary" style="width:100%;margin-top:10px;font-size:13px;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(59,130,246,0.1));border:1px solid rgba(139,92,246,0.25);box-shadow:none;">
+                            <div style="height:1px;background:rgba(255,255,255,0.05);margin:12px 0;"></div>
+                            <div class="order-field-label">Тема:</div>
+                            <div class="order-field-value" style="margin-bottom:12px;">${o.topic || '—'}</div>
+                            <div class="order-field-label">📝 Коментар від офісу:</div>
+                            <div class="order-field-value" style="margin-bottom:12px;font-size:12px;color:#94a3b8;">${o.office_comment || '(нема коментарів)'}</div>
+                            <button onclick="openOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})" class="btn-primary" style="width:100%;font-size:13px;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(59,130,246,0.1));border:1px solid rgba(139,92,246,0.25);box-shadow:none;">
                                 <i data-lucide="eye" class="w-4 h-4"></i> Детально
                             </button>`;
                     }
@@ -1329,11 +1341,19 @@
             vibrate('warning');
             document.getElementById('cancel-success-order-id').textContent = '№ ' + cancelledId;
             showPage('page-cancel-success');
+            // Автоматично завантажити список Скасованих через 2 секунди
+            setTimeout(() => {
+                loadOrders('Скасована');
+            }, 2000);
         })
         .catch(() => {
             vibrate('warning');
             document.getElementById('cancel-success-order-id').textContent = '№ ' + cancelledId;
             showPage('page-cancel-success');
+            // Автоматично завантажити список Скасованих через 2 секунди
+            setTimeout(() => {
+                loadOrders('Скасована');
+            }, 2000);
         });
     }
 
@@ -1351,7 +1371,7 @@
         .then(data => {
             if (data.status === 'success' && data.orders) {
                 const active = data.orders.filter(o => o.status === 'Активна').length;
-                const done   = data.orders.filter(o => o.status === 'Архів').length;
+                const done   = data.orders.filter(o => o.status === 'Виконані' || o.status === 'Архів').length;
                 const now = new Date();
                 const month = data.orders.filter(o => {
                     if (!o.timestamp) return false;
@@ -1381,6 +1401,7 @@
             if (data.status === 'success' && data.orders) {
                 document.getElementById('menu-stat-active').textContent  = data.orders.filter(o => o.status === 'Активна').length;
                 document.getElementById('menu-stat-cancel').textContent  = data.orders.filter(o => o.status === 'Скасована').length;
+                document.getElementById('menu-stat-completed').textContent = data.orders.filter(o => o.status === 'Виконані').length;
                 document.getElementById('menu-stat-archive').textContent = data.orders.filter(o => o.status === 'Архів').length;
             }
         }).catch(() => {});
