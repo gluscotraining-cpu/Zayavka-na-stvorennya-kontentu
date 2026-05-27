@@ -3,1452 +3,999 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#060a12">
-    <title>Запит на контент</title>
+    <title>Заявка на підбір персоналу</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root {
-            --bg: #060a12;
-            --surface: rgba(30, 41, 59, 0.45);
-            --border: rgba(255,255,255,0.07);
-            --border-strong: rgba(255,255,255,0.13);
-            --blue: #3b82f6;
-            --emerald: #10b981;
-            --amber: #f59e0b;
-            --red: #ef4444;
-            --violet: #8b5cf6;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--bg);
-            color: #f1f5f9;
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            padding: 0 16px env(safe-area-inset-bottom, 24px);
-            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        input, textarea {
-            -webkit-user-select: text;
-            user-select: text;
-            -webkit-touch-callout: default;
-            font-size: 16px !important;
-        }
+        body { font-family: 'DM Sans', sans-serif; background-color: #060a12; overflow-x: hidden; -webkit-overflow-scrolling: touch; color: #f8fafc; }
+        h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Syne', sans-serif; }
+        input, textarea, select { user-select: text; font-size: 16px !important; }
 
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
+            content: ''; position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 0;
         }
 
-        .blob { position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; }
-        .blob-violet { top: -15%; left: -15%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(139,92,246,0.20) 0%, transparent 70%); animation: drift1 14s ease-in-out infinite alternate; }
-        .blob-blue   { bottom: -15%; right: -15%; width: 380px; height: 380px; background: radial-gradient(circle, rgba(59,130,246,0.16) 0%, transparent 70%); animation: drift2 17s ease-in-out infinite alternate; }
-        @keyframes drift1 { from { transform: scale(1); } to { transform: translate(20px, 15px) scale(1.08); } }
-        @keyframes drift2 { from { transform: scale(1); } to { transform: translate(-15px, -20px) scale(0.94); } }
+        .blob { position: fixed; border-radius: 50%; filter: blur(100px); z-index: 0; pointer-events: none; opacity: 0.5; animation: float 10s ease-in-out infinite alternate; }
+        .blob-pink { top: -10%; left: -10%; width: 400px; height: 400px; background: #ec4899; }
+        .blob-purple { bottom: 10%; right: -10%; width: 350px; height: 350px; background: #a855f7; animation-delay: -5s; }
+        .blob-cyan { top: 40%; left: 30%; width: 250px; height: 250px; background: #06b6d4; filter: blur(120px); opacity: 0.3; animation-delay: -2s; }
+
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
         .page-wrap { width: 100%; max-width: 390px; position: relative; z-index: 1; }
 
         .glass {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            background: rgba(20, 20, 35, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
+
         .glass-input {
-            background: rgba(10,16,28,0.7);
-            border: 1px solid rgba(255,255,255,0.09);
-            color: #f1f5f9;
-            transition: all 0.25s ease;
+            background: rgba(10,10,20,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f8fafc;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-input:focus { border-color: var(--violet); background: rgba(10,16,28,0.85); box-shadow: 0 0 0 4px rgba(139,92,246,0.12); outline: none; }
-        .error-input { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(239,68,68,0.12) !important; }
+        .glass-input:focus {
+            border-color: #ec4899;
+            background: rgba(20,10,30,0.8);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
+            outline: none;
+        }
+        @keyframes blink-error {
+            0%,100% { border-color: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,0.5); }
+            50%      { border-color: rgba(239,68,68,0.2); box-shadow: none; }
+        }
+        .error-input {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 10px rgba(239,68,68,0.3) !important;
+            animation: blink-error 0.55s ease 4 !important;
+        }
 
-        .font-display { font-family: 'Syne', sans-serif; }
+        .text-gradient { background: linear-gradient(135deg, #22d3ee, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .animate-fade { animation: fadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-fade { animation: fadeUp 0.4s ease forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        textarea::-webkit-scrollbar { width: 4px; }
-        textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+            color: white;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'Space Grotesk', 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6); }
+        .btn-primary:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(236, 72, 153, 0.4); }
 
-        .loader { border: 3px solid rgba(255,255,255,0.05); border-top-color: #8b5cf6; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.9s linear infinite; margin: 16px auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         .page-header { display: flex; align-items: center; gap: 12px; padding: 20px 0 24px; }
-        .btn-back { width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #94a3b8; transition: all 0.2s; }
-        .btn-back:active { transform: scale(0.93); background: rgba(255,255,255,0.07); }
-        .page-header h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #f1f5f9; }
+        .btn-back { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); color: #cbd5e1; transition: all 0.2s;}
+        .btn-back:active { transform: scale(0.92); }
 
-        .btn-primary { width: 100%; background: linear-gradient(135deg, #6d28d9, #4c1d95); color: white; padding: 15px; border-radius: 14px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; transition: all 0.2s; box-shadow: 0 6px 20px rgba(109,40,217,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary:hover { box-shadow: 0 8px 28px rgba(109,40,217,0.45); transform: translateY(-1px); }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-primary:disabled { opacity: 0.6; pointer-events: none; }
-        .btn-success { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 6px 20px rgba(5,150,105,0.3); }
-        .btn-success:hover { box-shadow: 0 8px 28px rgba(5,150,105,0.45); }
-        .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); box-shadow: none; }
-        .btn-danger:hover { background: rgba(239,68,68,0.22); box-shadow: none; }
-        .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #94a3b8; box-shadow: none; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.08); box-shadow: none; }
+        .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
 
-        .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; margin-bottom: 7px; display: flex; align-items: center; gap: 5px; }
+        .progress-steps { display: flex; gap: 4px; margin-bottom: 6px; }
+        .progress-step { flex: 1; height: 4px; border-radius: 99px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .progress-step.done { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+        .progress-step.active { background: #ec4899; box-shadow: 0 0 8px #ec4899; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; margin-bottom: 16px; font-weight: 500;}
+        .progress-label .current-step { color: #e879f9; font-weight: 700; }
 
-        .progress-wrap { padding: 0 0 20px; }
-        .progress-steps { display: flex; gap: 5px; margin-bottom: 7px; }
-        .progress-step { flex: 1; height: 3px; border-radius: 99px; transition: background 0.35s ease; }
-        .progress-step.done   { background: var(--emerald); }
-        .progress-step.active { background: var(--violet); }
-        .progress-step.idle   { background: rgba(255,255,255,0.09); }
-        .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #475569; }
-        .progress-label .current-step { color: #a78bfa; font-weight: 600; }
+        select option { background-color: #0f172a; color: white; }
 
-        /* Format chips */
-        .format-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .format-chip { padding: 12px 8px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #64748b; cursor: pointer; transition: all 0.2s; user-select: none; }
-        .format-chip:active { transform: scale(0.95); }
-        .format-chip .chip-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
-        .format-chip.active { background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.45); color: #c4b5fd; }
+        .summary-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #e879f9; letter-spacing: 0.1em; margin-top: 16px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;}
+        .summary-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-size: 13px; padding: 5px 0; }
+        .summary-label { color: #94a3b8; flex-shrink: 0; }
+        .summary-val { font-weight: 600; text-align: right; color: #f8fafc; word-break: break-word; overflow-wrap: anywhere; min-width: 0; flex: 1; }
+        .summary-block-text { font-size: 13px; color: #e2e8f0; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 4px; line-height: 1.6; word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; }
 
-        /* Audience chips */
-        .audience-chip { width: 100%; padding: 14px 16px; border-radius: 14px; text-align: left; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer; transition: all 0.2s; user-select: none; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-        .audience-chip:active { transform: scale(0.98); }
-        .audience-chip .aud-emoji { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
-        .audience-chip.active { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.4); color: #c4b5fd; }
-
-        /* Yes/No toggles */
-        .yn-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .yn-label { font-size: 14px; color: #cbd5e1; font-weight: 500; }
-        .yn-chips { display: flex; gap: 6px; }
-        .yn-chip { padding: 7px 18px; border-radius: 10px; font-size: 13px; font-weight: 700; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #64748b; cursor: pointer; transition: all 0.2s; }
-        .yn-chip:active { transform: scale(0.93); }
-        .yn-chip.yes.active { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4); color: #34d399; }
-        .yn-chip.no.active  { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.4); color: #f87171; }
-
-        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
-        .badge-active  { background: rgba(16,185,129,0.12);  color: #34d399;  border: 1px solid rgba(16,185,129,0.2); }
-        .badge-cancel  { background: rgba(239,68,68,0.12);   color: #f87171;  border: 1px solid rgba(239,68,68,0.2); }
-        .badge-archive { background: rgba(100,116,139,0.12); color: #94a3b8;  border: 1px solid rgba(100,116,139,0.2); }
-
-        .order-card { border-radius: 18px; overflow: hidden; margin-bottom: 12px; background: rgba(15,23,42,0.55); border: 1px solid var(--border); backdrop-filter: blur(12px); }
-        .order-card-stripe { height: 2px; }
-        .order-card-body { padding: 16px; }
-        .order-id { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: #a78bfa; }
-        .order-ts { font-size: 10px; color: #475569; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); }
-        .order-chip { font-size: 11px; color: #94a3b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); padding: 4px 9px; border-radius: 7px; }
-        .order-chip span { color: rgba(255,255,255,0.8); }
-        .order-field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #475569; margin-bottom: 3px; }
-        .order-field-value { font-size: 13px; color: #cbd5e1; line-height: 1.5; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; }
-
-        #page-success .success-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(139,92,246,0.1); border: 2px solid rgba(139,92,246,0.3); display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 20px; box-shadow: 0 0 40px rgba(139,92,246,0.2); }
-        #page-success .success-id-card { background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.15); border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 20px; }
-
-        .stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .stat-tile { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center; }
-        .stat-num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; }
-        .stat-lbl { font-size: 10px; color: #475569; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
-
-        .main-cta { background: linear-gradient(140deg, #5b21b6 0%, #4c1d95 100%); border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; position: relative; overflow: hidden; box-shadow: 0 8px 28px rgba(91,33,182,0.4); transition: transform 0.15s, box-shadow 0.15s; cursor: pointer; }
-        .main-cta::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); }
-        .main-cta::after  { content: ''; position: absolute; bottom: -30px; right: -20px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.04); }
-        .main-cta:active { transform: scale(0.98); box-shadow: 0 4px 16px rgba(91,33,182,0.35); }
-        .cta-icon-wrap { width: 46px; height: 46px; border-radius: 14px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
-        .cta-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: white; }
-        .cta-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-        .cta-arrow { font-size: 20px; color: rgba(255,255,255,0.3); margin-left: auto; position: relative; z-index: 1; }
-
-        .sec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .sec-tile { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
-        .sec-tile:active { background: rgba(255,255,255,0.07); transform: scale(0.97); }
-        .sec-tile-icon { font-size: 22px; }
-        .sec-tile-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; color: #cbd5e1; }
-        .sec-tile-sub { font-size: 10px; color: #475569; }
-
-        input[type="date"] { color-scheme: dark; width: 100%; box-sizing: border-box; display: block; min-height: 52px; cursor: pointer; position: relative; }
-        input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.3); border-radius: 99px; }
     </style>
 </head>
-<body>
+<body class="p-6 pb-24 flex justify-center relative">
 
-<div class="blob blob-violet"></div>
-<div class="blob blob-blue"></div>
+    <div class="blob blob-pink"></div>
+    <div class="blob blob-purple"></div>
+    <div class="blob blob-cyan"></div>
 
-<div class="page-wrap">
+    <div class="page-wrap">
 
-    <!-- ══════════════════════ PAGE 1: HOME ══════════════════════ -->
-    <div id="page-1" class="page-section animate-fade">
-
-        <div style="width:100%;text-align:center;padding:24px 0 16px;">
-            <div style="width:140px;height:140px;margin:0 auto 20px;position:relative;">
-                <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
-                    <defs>
-                        <radialGradient id="g1" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
-                            <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
-                        </radialGradient>
-                        <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stop-color="#8b5cf6"/>
-                            <stop offset="100%" stop-color="#3b82f6"/>
-                        </linearGradient>
-                        <filter id="gblur"><feGaussianBlur stdDeviation="6"/></filter>
-                    </defs>
-                    <!-- Glow -->
-                    <ellipse cx="70" cy="85" rx="50" ry="35" fill="url(#g1)" filter="url(#gblur)"/>
-                    <!-- Document base -->
-                    <rect x="25" y="28" width="70" height="88" rx="8" fill="rgba(15,23,42,0.92)" stroke="rgba(139,92,246,0.45)" stroke-width="1.5"/>
-                    <!-- Header bar -->
-                    <rect x="25" y="28" width="70" height="16" rx="8" fill="rgba(139,92,246,0.2)"/>
-                    <rect x="33" y="34" width="30" height="4" rx="2" fill="rgba(139,92,246,0.7)"/>
-                    <!-- Lines of text -->
-                    <rect x="33" y="54" width="54" height="4" rx="2" fill="rgba(255,255,255,0.18)"/>
-                    <rect x="33" y="63" width="44" height="4" rx="2" fill="rgba(255,255,255,0.12)"/>
-                    <rect x="33" y="72" width="50" height="4" rx="2" fill="rgba(255,255,255,0.12)"/>
-                    <rect x="33" y="81" width="36" height="4" rx="2" fill="rgba(255,255,255,0.08)"/>
-                    <!-- Divider -->
-                    <line x1="33" y1="94" x2="87" y2="94" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
-                    <!-- Tag chip -->
-                    <rect x="33" y="100" width="28" height="9" rx="4.5" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-                    <rect x="66" y="100" width="22" height="9" rx="4.5" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.35)" stroke-width="1"/>
-                    <!-- Pencil -->
-                    <g transform="rotate(-35, 95, 45)">
-                        <rect x="87" y="22" width="8" height="28" rx="2" fill="url(#g2)"/>
-                        <polygon points="87,50 95,50 91,58" fill="#a78bfa"/>
-                        <rect x="87" y="22" width="8" height="6" rx="2" fill="rgba(255,255,255,0.3)"/>
-                    </g>
-                    <!-- Stars -->
-                    <circle cx="22" cy="50" r="1.5" fill="#a78bfa" opacity="0.7">
-                        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.8s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle cx="118" cy="70" r="1.5" fill="#60a5fa" opacity="0.6">
-                        <animate attributeName="opacity" values="0.6;0.1;0.6" dur="3.2s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle cx="115" cy="42" r="1" fill="#c4b5fd" opacity="0.8">
-                        <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.4s" repeatCount="indefinite"/>
-                    </circle>
-                    <!-- Orbit ring -->
-                    <circle cx="70" cy="72" r="54" stroke="rgba(139,92,246,0.08)" stroke-width="1" stroke-dasharray="4 7" fill="none">
-                        <animateTransform attributeName="transform" type="rotate" values="0 70 72;360 70 72" dur="22s" repeatCount="indefinite"/>
-                    </circle>
-                </svg>
-            </div>
-            <h1 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#f1f5f9;margin-bottom:6px;letter-spacing:-0.02em;">Запит на контент</h1>
-            <p style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Створення навчального контенту</p>
-        </div>
-
-        <div class="stats-strip" style="margin-bottom:16px;">
-            <div class="stat-tile" style="border-color:rgba(139,92,246,0.15);cursor:pointer;" onclick="loadOrders('Активна')">
-                <div class="stat-num" style="color:#a78bfa;" id="stat-active">—</div>
-                <div class="stat-lbl" style="color:#a78bfa;opacity:0.7;">Активні</div>
-            </div>
-            <div class="stat-tile" style="border-color:rgba(16,185,129,0.15);">
-                <div class="stat-num" style="color:#34d399;" id="stat-done">—</div>
-                <div class="stat-lbl" style="color:#34d399;opacity:0.7;">Виконані</div>
-            </div>
-            <div class="stat-tile" style="border-color:rgba(96,165,250,0.15);">
-                <div class="stat-num" style="color:#60a5fa;" id="stat-month">—</div>
-                <div class="stat-lbl" style="color:#60a5fa;opacity:0.7;">Цей місяць</div>
-            </div>
-        </div>
-
-        <div class="main-cta" onclick="startNewRequest()" style="margin-top:16px;">
-            <div class="cta-icon-wrap">✍️</div>
-            <div>
-                <div class="cta-title">Нова заявка</div>
-                <div class="cta-sub">Запит на створення контенту</div>
-            </div>
-            <div class="cta-arrow">›</div>
-        </div>
-
-        <div class="sec-grid">
-            <div class="sec-tile" onclick="showPage('page-my-orders-menu')">
-                <div class="sec-tile-icon">📋</div>
-                <div class="sec-tile-label">Мої заявки</div>
-                <div class="sec-tile-sub">Активні / Архів</div>
-            </div>
-            <div class="sec-tile" onclick="openProfileFromMenu()">
-                <div class="sec-tile-icon">⚙️</div>
-                <div class="sec-tile-label">Профіль</div>
-                <div class="sec-tile-sub">Мої дані</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE: MY ORDERS MENU ══════════════════════ -->
-    <div id="page-my-orders-menu" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-1')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Мої заявки</h2>
-        </div>
-
-        <div onclick="loadOrders('Активна')" style="position:relative;overflow:hidden;border-radius:22px;padding:24px;margin-bottom:12px;cursor:pointer;background:linear-gradient(135deg,rgba(139,92,246,0.18) 0%,rgba(139,92,246,0.05) 100%);border:1px solid rgba(139,92,246,0.25);transition:transform 0.15s;"
-            onpointerdown="this.style.transform='scale(0.98)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-            <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.3),transparent 70%);pointer-events:none;"></div>
-            <div style="display:flex;align-items:center;gap:16px;">
-                <div style="width:56px;height:56px;border-radius:16px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px;">📝</div>
-                <div style="flex:1;">
-                    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#a78bfa;margin-bottom:2px;">Активні</div>
-                    <div style="font-size:12px;color:rgba(167,139,250,0.6);">Заявки в обробці</div>
+        <div id="page-1" class="page-section flex flex-col items-center pt-8 animate-fade">
+            <div class="w-full text-center mb-10">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-tr from-pink-600/20 to-cyan-500/20 rounded-[2rem] flex items-center justify-center border border-white/10 shadow-[0_0_30px_rgba(236,72,153,0.2)]">
+                    <i data-lucide="scan-face" class="w-12 h-12 text-pink-400"></i>
                 </div>
-                <div style="text-align:right;">
-                    <div id="menu-stat-active" style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#a78bfa;line-height:1;">—</div>
-                    <div style="font-size:10px;color:rgba(167,139,250,0.5);text-transform:uppercase;letter-spacing:0.1em;">заявок</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-            <div onclick="loadOrders('Скасована')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(239,68,68,0.15) 0%,rgba(239,68,68,0.04) 100%);border:1px solid rgba(239,68,68,0.22);transition:transform 0.15s;"
-                onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-                <div style="width:38px;height:38px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">❌</div>
-                <div id="menu-stat-cancel" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#f87171;line-height:1;margin-bottom:3px;">—</div>
-                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#f87171;margin-bottom:2px;">Скасовані</div>
-                <div style="font-size:9px;color:rgba(248,113,113,0.5);">Відхилені</div>
-            </div>
-            <div onclick="loadOrders('Виконані')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(16,185,129,0.13) 0%,rgba(16,185,129,0.03) 100%);border:1px solid rgba(16,185,129,0.2);transition:transform 0.15s;"
-                onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-                <div style="width:38px;height:38px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">✅</div>
-                <div id="menu-stat-completed" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#34d399;line-height:1;margin-bottom:3px;">—</div>
-                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#34d399;margin-bottom:2px;">Виконані</div>
-                <div style="font-size:9px;color:rgba(52,211,153,0.5);">Завершені</div>
-            </div>
-            <div onclick="loadOrders('Архів')" style="position:relative;overflow:hidden;border-radius:18px;padding:18px 14px;cursor:pointer;background:linear-gradient(135deg,rgba(59,130,246,0.13) 0%,rgba(59,130,246,0.03) 100%);border:1px solid rgba(59,130,246,0.2);transition:transform 0.15s;"
-                onpointerdown="this.style.transform='scale(0.97)'" onpointerup="this.style.transform='scale(1)'" onpointerleave="this.style.transform='scale(1)'">
-                <div style="width:38px;height:38px;border-radius:12px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;">📦</div>
-                <div id="menu-stat-archive" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#60a5fa;line-height:1;margin-bottom:3px;">—</div>
-                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:2px;">Архів</div>
-                <div style="font-size:9px;color:rgba(96,165,250,0.5);">В архіві</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE: ORDERS LIST ══════════════════════ -->
-    <div id="page-orders-list" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-my-orders-menu')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2 id="orders-list-title">...</h2>
-        </div>
-        <div id="orders-loading" class="text-center py-12" style="color:#475569;">
-            <div class="loader"></div>
-            <p style="font-size:13px;">Завантаження...</p>
-        </div>
-        <div id="orders-container" class="hidden"></div>
-    </div>
-
-    <!-- ══════════════════════ PAGE: CANCEL REASON ══════════════════════ -->
-    <div id="page-cancel-reason" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-orders-list')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2 style="color:#f87171;">Скасування</h2>
-        </div>
-        <div class="glass rounded-2xl p-5 flex flex-col" style="min-height:55vh;border-color:rgba(239,68,68,0.2);">
-            <div class="field-label" style="margin-bottom:8px;"><i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i> Причина скасування</div>
-            <textarea id="cancel-reason-text" placeholder="Детально опишіть причину..." class="w-full flex-1 p-4 rounded-xl glass-input resize-none text-[14px] leading-relaxed" style="min-height:120px;"></textarea>
-            
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
-                <div class="field-label" style="margin-bottom:8px;"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Коментар від офісу</div>
-                <textarea id="cancel-office-comment" placeholder="Опціональний коментар для замовника..." class="w-full p-4 rounded-xl glass-input resize-none text-[14px] leading-relaxed" style="min-height:100px;"></textarea>
-            </div>
-            
-            <div style="display:flex;gap:10px;padding-top:14px;">
-                <button onclick="showPage('page-orders-list')" class="btn-primary btn-secondary" style="flex:0.6;">Назад</button>
-                <button onclick="submitCancellation()" class="btn-primary btn-danger" style="flex:1;">Скасувати заявку</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE 2: PROFILE ══════════════════════ -->
-    <div id="page-2" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-1')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Мій профіль</h2>
-        </div>
-
-        <div style="text-align:center;padding:8px 0 28px;position:relative;">
-            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.35),transparent 70%);filter:blur(16px);pointer-events:none;"></div>
-            <div style="position:relative;display:inline-block;">
-                <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#6366f1,#3b82f6);padding:2px;margin:0 auto;">
-                    <div style="width:100%;height:100%;border-radius:50%;background:#0d1420;display:flex;align-items:center;justify-content:center;">
-                        <div id="profile-avatar-text" style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">?</div>
-                    </div>
-                </div>
-                <div style="position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#6366f1);border:2px solid #0d1420;display:flex;align-items:center;justify-content:center;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </div>
-            </div>
-            <div id="profile-name-display" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#f1f5f9;margin-top:12px;margin-bottom:3px;">—</div>
-            <div id="profile-phone-display" style="font-size:13px;color:#475569;">Не заповнено</div>
-        </div>
-
-        <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.07);border-radius:20px;overflow:hidden;margin-bottom:12px;">
-            <div style="padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                    <div style="width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </div>
-                    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#7c3aed;">ПІБ</div>
-                </div>
-                <input type="text" id="user-fio" placeholder="Прізвище Ім'я По-батькові" class="glass-input text-[15px]" oninput="updateProfilePreview()" style="width:100%;padding:12px 14px;border-radius:12px;font-size:15px;">
-            </div>
-            <div style="padding:16px 18px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                    <div style="width:32px;height:32px;border-radius:9px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 1.18 2 2 0 014 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/></svg>
-                    </div>
-                    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#3b82f6;">Телефон</div>
-                </div>
-                <input type="tel" id="user-phone" placeholder="38 0__ ___ __ __" class="glass-input text-[15px]" oninput="updateProfilePreview()" style="width:100%;padding:12px 14px;border-radius:12px;font-size:15px;">
-            </div>
-        </div>
-
-        <button onclick="saveProfile()" class="btn-primary" style="background:linear-gradient(135deg,#6d28d9,#4c1d95);box-shadow:0 6px 20px rgba(109,40,217,0.35);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Зберегти профіль
-        </button>
-        <p style="text-align:center;font-size:11px;color:#334155;margin-top:14px;line-height:1.5;">Дані зберігаються локально на пристрої<br>та використовуються для автозаповнення форм</p>
-    </div>
-
-    <!-- ══════════════════════ PAGE 3: ТЕМА + ДЕДЛАЙН (Step 1/4) ══════════════════════ -->
-    <div id="page-3" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-1')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Тема та дедлайн</h2>
-        </div>
-        <div class="progress-wrap">
-            <div class="progress-steps">
-                <div class="progress-step active"></div>
-                <div class="progress-step idle"></div>
-                <div class="progress-step idle"></div>
-                <div class="progress-step idle"></div>
-            </div>
-            <div class="progress-label"><span class="current-step">Тема</span><span>1 / 4</span></div>
-        </div>
-
-        <div class="glass rounded-2xl p-5 space-y-5">
-            <div>
-                <div class="field-label"><i data-lucide="type" class="w-3.5 h-3.5" style="color:#a78bfa;"></i> Тема</div>
-                <input type="text" id="topic" placeholder="Коротко: про що контент?" class="w-full p-4 rounded-xl glass-input text-[15px]">
-            </div>
-            <div>
-                <div class="field-label"><i data-lucide="calendar" class="w-3.5 h-3.5" style="color:#f59e0b;"></i> Дедлайн</div>
-                <input type="date" id="deadline" class="w-full rounded-xl glass-input" style="padding:14px 16px;font-size:16px;">
-                <p style="font-size:11px;color:#475569;margin-top:6px;">Дата, до якої потрібен готовий контент</p>
-            </div>
-            <div>
-                <div class="field-label"><i data-lucide="users" class="w-3.5 h-3.5" style="color:#a78bfa;"></i> Для кого призначений контент?</div>
-                <select id="audience-select" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none" onchange="checkOtherAudience(this)" style="cursor:pointer;">
-                    <option value="" disabled selected>Оберіть аудиторію...</option>
-                    <option value="🛒 Касири">🛒 Касири</option>
-                    <option value="⛽ Оператори">⛽ Оператори</option>
-                    <option value="👔 Начальники АЗК">👔 Начальники АЗК</option>
-                    <option value="👩‍💻 Офісні співробітники">👩‍💻 Офісні співробітники</option>
-                    <option value="other">▶️ Інше</option>
-                </select>
-                <div id="custom-audience-wrap" class="hidden" style="margin-top:10px;">
-                    <input type="text" id="custom-audience" placeholder="Наприклад: Для менеджерів кафе" class="w-full p-4 rounded-xl glass-input text-[15px] animate-fade">
-                </div>
-                <input type="hidden" id="audience" value="">
-            </div>
-            <button onclick="goToPage4()" class="btn-primary">Продовжити →</button>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE 4: ТЗ + ФОРМАТ (Step 2/4) ══════════════════════ -->
-    <div id="page-4" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-3')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Технічне завдання</h2>
-        </div>
-        <div class="progress-wrap">
-            <div class="progress-steps">
-                <div class="progress-step done"></div>
-                <div class="progress-step active"></div>
-                <div class="progress-step idle"></div>
-                <div class="progress-step idle"></div>
-            </div>
-            <div class="progress-label"><span class="current-step">ТЗ</span><span>2 / 4</span></div>
-        </div>
-        <div class="glass rounded-2xl p-5" style="display:flex;flex-direction:column;gap:20px;">
-            <!-- Format selection -->
-            <div>
-                <div class="field-label"><i data-lucide="layout" class="w-3.5 h-3.5" style="color:#a78bfa;"></i> Формат контенту</div>
-                <select id="format-select" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none" onchange="checkOtherFormat(this)" style="cursor:pointer;">
-                    <option value="" disabled selected>Оберіть формат...</option>
-                    <option value="🎬 Відео">🎬 Відео</option>
-                    <option value="📊 Презентація">📊 Презентація</option>
-                    <option value="other">🔖 Інше</option>
-                </select>
-                <div id="other-format-wrap" class="hidden" style="margin-top:10px;">
-                    <input type="text" id="other-format" placeholder="Опишіть формат контенту..." class="w-full p-4 rounded-xl glass-input text-[15px] animate-fade">
-                </div>
-                <input type="hidden" id="format" value="">
-            </div>
-            <!-- ТЗ textarea -->
-            <div style="display:flex;flex-direction:column;">
-                <div class="field-label"><i data-lucide="file-text" class="w-3.5 h-3.5"></i> Детальне ТЗ</div>
-                <p style="font-size:12px;color:#475569;margin-bottom:10px;line-height:1.5;">Напишіть одним повідомленням детально, що саме потрібно створити. Це допоможе зробити саме те, що ви очікуєте.</p>
-                <textarea id="tz" placeholder="Опишіть детально: мета, ключові тези, стиль, обсяг, особливі вимоги..." class="w-full p-4 rounded-xl glass-input resize-none text-[15px] leading-relaxed" style="min-height:220px;"></textarea>
-            </div>
-            <button onclick="goToPage5()" class="btn-primary">Продовжити →</button>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE 6: МАТЕРІАЛИ (Step 3/4) ══════════════════════ -->
-    <div id="page-6" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-4')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Матеріали</h2>
-        </div>
-        <div class="progress-wrap">
-            <div class="progress-steps">
-                <div class="progress-step done"></div>
-                <div class="progress-step done"></div>
-                <div class="progress-step active"></div>
-                <div class="progress-step idle"></div>
-            </div>
-            <div class="progress-label"><span class="current-step">Матеріали</span><span>3 / 4</span></div>
-        </div>
-        <div class="glass rounded-2xl p-5">
-            <p style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6;">До ТЗ будуть додані додаткові матеріали? Оберіть, що є в наявності:</p>
-
-            <div style="margin-bottom:4px;">
-                <div class="yn-row" style="border-bottom:none;">
-                    <div>
-                        <div class="yn-label">🎬 Медіафайли</div>
-                        <div style="font-size:11px;color:#475569;margin-top:2px;">Фото, відео, аудіо</div>
-                    </div>
-                    <div class="yn-chips">
-                        <div class="yn-chip yes" id="yn-media-yes" onclick="selectYN('media','yes')">Так</div>
-                        <div class="yn-chip no  active" id="yn-media-no"  onclick="selectYN('media','no')">Ні</div>
-                    </div>
-                </div>
+                <h1 class="text-3xl font-bold tracking-tight mb-2 text-gradient">HR Рекрутинг</h1>
+                <p class="text-xs text-slate-400 uppercase tracking-[0.2em] font-semibold mb-5">Подача заявок на персонал</p>
+                <h2 class="text-2xl font-bold tracking-tight mb-3 text-white">Знайдемо ідеального<br>кандидата</h2>
+                <p class="text-xs text-slate-400 max-w-[280px] mx-auto leading-relaxed">Сформуйте заявку на підбір персоналу за декілька простих кроків</p>
             </div>
 
-            <!-- Link field — shown when any "Так" is selected -->
-            <div id="materials-link-wrap" class="hidden" style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
-                <div class="field-label" style="margin-bottom:8px;"><i data-lucide="link" class="w-3.5 h-3.5" style="color:#60a5fa;"></i> Посилання на файли</div>
-                <input type="url" id="materials-link" inputmode="url" placeholder="Google Drive, Dropbox тощо..." class="w-full p-4 rounded-xl glass-input text-[15px]">
-                <p style="font-size:11px;color:#475569;margin-top:7px;display:flex;align-items:flex-start;gap:4px;line-height:1.5;">
-                    <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0" style="margin-top:1px;"></i>
-                    Збережіть файли (будь-якого розміру) на Google Drive або іншому хмарному сховищі та вставте посилання
-                </p>
-            </div>
-
-            <button onclick="goToPage7()" class="btn-primary" style="margin-top:20px;">Перевірити заявку →</button>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE 7: ПІДТВЕРДЖЕННЯ (Step 5/5) ══════════════════════ -->
-    <div id="page-7" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-6')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Підтвердження</h2>
-        </div>
-        <div class="progress-wrap">
-            <div class="progress-steps">
-                <div class="progress-step done"></div>
-                <div class="progress-step done"></div>
-                <div class="progress-step done"></div>
-                <div class="progress-step active"></div>
-            </div>
-            <div class="progress-label"><span class="current-step">Перевірка</span><span>4 / 4</span></div>
-        </div>
-
-        <div class="glass rounded-2xl p-5" style="position:relative;overflow:hidden;margin-bottom:14px;">
-            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);"></div>
-
-            <!-- Header -->
-            <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:12px;padding:12px 14px;margin-bottom:18px;">
-                <div style="font-size:10px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px;">Заявка на</div>
-                <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#c4b5fd;">Створення навчального контенту</div>
-            </div>
-
-            <!-- Requester block -->
-            <div style="display:grid;gap:8px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div style="display:flex;justify-content:space-between;">
-                    <span style="font-size:12px;color:#475569;">🧑‍💼 Замовник</span>
-                    <span id="sum-fio" style="font-size:13px;font-weight:600;text-align:right;max-width:60%;"></span>
-                </div>
-                <div style="display:flex;justify-content:space-between;">
-                    <span style="font-size:12px;color:#475569;">☎️ Телефон</span>
-                    <span id="sum-phone" style="font-size:13px;font-weight:600;"></span>
-                </div>
-                <div style="display:flex;justify-content:space-between;">
-                    <span style="font-size:12px;color:#475569;">🕐 Створено</span>
-                    <span id="sum-date-created" style="font-size:13px;font-weight:600;color:#94a3b8;"></span>
-                </div>
-            </div>
-
-            <!-- Request details -->
-            <div style="display:grid;gap:12px;min-width:0;width:100%;box-sizing:border-box;">
-                <div style="padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:12px;color:#475569;margin-bottom:4px;">📌 Тема</div>
-                    <div id="sum-topic" style="font-size:13px;font-weight:700;color:#e2e8f0;word-break:break-word;overflow-wrap:break-word;line-height:1.5;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <span style="font-size:12px;color:#475569;">⏰ Дедлайн</span>
-                    <span id="sum-deadline" style="font-size:14px;font-weight:800;color:#f59e0b;"></span>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <span style="font-size:12px;color:#475569;">🎨 Формат</span>
-                    <span id="sum-format" style="font-size:13px;font-weight:700;color:#c4b5fd;"></span>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <span style="font-size:12px;color:#475569;">👥 Аудиторія</span>
-                    <span id="sum-audience" style="font-size:13px;font-weight:700;color:#e2e8f0;text-align:right;max-width:60%;"></span>
-                </div>
-
-                <div>
-                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;color:#475569;margin-bottom:6px;">📝 Технічне завдання</div>
-                    <div id="sum-tz" style="font-size:13px;color:#cbd5e1;white-space:pre-wrap;word-break:break-all;overflow-wrap:break-word;line-height:1.6;background:rgba(255,255,255,0.03);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);width:100%;box-sizing:border-box;min-width:0;"></div>
-                </div>
-
-                <div>
-                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;color:#475569;margin-bottom:6px;">🎬 Медіафайли</div>
-                    <div style="display:grid;gap:6px;">
-                        <div style="display:flex;justify-content:space-between;">
-                            <span style="font-size:12px;color:#64748b;">Медіафайли (фото, відео, аудіо)</span>
-                            <span id="sum-media" style="font-size:13px;font-weight:700;"></span>
+            <div class="w-full space-y-4">
+                <div class="glass rounded-3xl p-5 border border-pink-500/20 relative overflow-hidden cursor-pointer" onclick="startNewRequest()">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-pink-500/10 rounded-xl text-pink-400"><i data-lucide="user-plus"></i></div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white font-display">Нова заявка</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Запит на підбір нового співробітника</p>
                         </div>
-                        <div id="sum-link-row" class="hidden" style="padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">
-                            <div style="font-size:11px;color:#475569;margin-bottom:4px;">🔗 Посилання:</div>
-                            <div id="sum-link" style="font-size:12px;color:#60a5fa;word-break:break-all;overflow-wrap:break-word;width:100%;box-sizing:border-box;min-width:0;"></div>
-                        </div>
+                        <i data-lucide="chevron-right" class="text-slate-500 ml-auto w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all hover:bg-white/5 active:scale-95" onclick="alert('Розділ заявок буде підключено на етапі таблиць!')">
+                        <i data-lucide="layout-list" class="text-cyan-400 w-7 h-7"></i>
+                        <span class="font-semibold text-sm text-slate-200">Мої заявки</span>
+                    </div>
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center gap-3 cursor-pointer transition-all hover:bg-white/5 active:scale-95" onclick="showPage('page-2')">
+                        <i data-lucide="fingerprint" class="text-purple-400 w-7 h-7"></i>
+                        <span class="font-semibold text-sm text-slate-200">Профіль</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div style="display:flex;gap:10px;padding-bottom:20px;">
-            <button onclick="showPage('page-3')" class="btn-primary btn-secondary" style="flex:0.7;">Редагувати</button>
-            <button id="btn-submit" onclick="submitForm()" class="btn-primary btn-success" style="flex:1;">
-                <i data-lucide="send" class="w-4 h-4"></i> Відправити
-            </button>
-        </div>
-    </div>
-
-    <!-- ══════════════════════ PAGE: SUCCESS ══════════════════════ -->
-    <div id="page-success" class="page-section hidden" style="padding-top:60px;text-align:center;">
-        <div class="success-circle animate-pop">✍️</div>
-        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#a78bfa;margin-bottom:6px;">Заявку прийнято!</div>
-        <div style="font-size:14px;color:#64748b;margin-bottom:28px;">Ваш запит передано на опрацювання</div>
-
-        <div class="success-id-card">
-            <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Номер заявки</div>
-            <div id="success-order-id" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#a78bfa;">—</div>
-        </div>
-
-        <div style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:24px;">
-            Статус можна відстежити в розділі<br>
-            <span style="color:#a78bfa;">Мої заявки → Активні</span>
-        </div>
-
-        <button onclick="showPage('page-1')" class="btn-primary">На головну →</button>
-    </div>
-
-    <!-- ══════════════════════ PAGE: ORDER DETAIL ══════════════════════ -->
-    <div id="page-order-detail" class="page-section hidden">
-        <div class="page-header">
-            <button class="btn-back" onclick="showPage('page-orders-list')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h2>Деталі заявки</h2>
-        </div>
-
-        <div class="glass rounded-2xl p-5" style="position:relative;overflow:hidden;margin-bottom:14px;">
-            <div id="detail-stripe" style="position:absolute;top:0;left:0;right:0;height:2px;background:#8b5cf6;"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-                <div id="detail-id" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#a78bfa;"></div>
-                <div id="detail-badge"></div>
+        <div id="page-2" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-1')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Власний кабінет</h2>
             </div>
-            <div id="detail-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;"></div>
-            <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px;"></div>
-            <div style="display:grid;gap:14px;">
-                <div>
-                    <div class="order-field-label">Замовник</div>
-                    <div id="detail-fio" class="order-field-value"></div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-sm text-slate-400 mb-6 leading-relaxed">Вкажіть ваші дані для швидкого автозаповнення в майбутньому.</p>
+                <div class="mb-5">
+                    <div class="field-label"><i data-lucide="user" class="w-4 h-4 text-cyan-400"></i> Ваше ПІБ</div>
+                    <input type="text" id="user-fio" placeholder="Прізвище Ім'я" class="w-full p-4 rounded-xl glass-input text-[15px]">
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div class="mb-8">
+                    <div class="field-label"><i data-lucide="phone" class="w-4 h-4 text-pink-400"></i> Номер телефону</div>
+                    <input type="tel" id="user-phone" placeholder="38 0__ ___ __ __" class="w-full p-4 rounded-xl glass-input text-[15px]">
+                </div>
+                <button onclick="saveProfile()" class="btn-primary">Зберегти та продовжити</button>
+            </div>
+        </div>
+
+        <div id="page-3" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-1')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Підрозділ та Керівник</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Структура компанії (для кого ведеться підбір кандидата)</span><span>1 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-5">
+                <div>
+                    <div class="field-label">Департамент / Відділ / ... (Локація № АЗК)</div>
+                    <input type="text" id="department" placeholder="Напр: АЗК №55, Офіс розвитку..." class="w-full p-4 rounded-xl glass-input text-[15px]">
+                </div>
+                <div>
+                    <div class="field-label">П.І.Б. керівника департаменту/відділу/Локація (№ АЗК)</div>
+                    <input type="text" id="manager-fio" placeholder="Напр: Петров Петро Петрович" class="w-full p-4 rounded-xl glass-input text-[15px]" oninput="lettersOnly(this)">
+                </div>
+                <div>
+                    <div class="field-label">Вакансія погоджена з керівником?</div>
+                    <select id="manager-approved" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть зі списку...</option>
+                        <option value="Так">🟢 Так, погоджено</option>
+                        <option value="Ні">🔴 Ні, не погоджено</option>
+                    </select>
+                </div>
+                <button onclick="goToPage3b()" class="btn-primary mt-4">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-3b" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-3')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Назва вакансії</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Посада та кількість підлеглих в підпорядкуванні</span><span>2 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-4">
+                <div>
+                    <div class="field-label">Назва вакантної посади</div>
+                    <input type="text" id="job-title" placeholder="Напр: Касир, Оператор, Менеджер..." class="w-full p-4 rounded-xl glass-input text-[15px]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <div class="order-field-label">Формат</div>
-                        <div id="detail-format" style="font-size:13px;font-weight:700;color:#c4b5fd;"></div>
+                        <div class="field-label">Кількість вакансій</div>
+                        <input type="number" id="vacancies-count" placeholder="Напр: 5" class="w-full p-4 rounded-xl glass-input text-[15px]">
                     </div>
                     <div>
-                        <div class="order-field-label">Дедлайн</div>
-                        <div id="detail-deadline" style="font-size:13px;font-weight:700;color:#f59e0b;"></div>
+                        <div class="field-label">Підлеглі (кількість осіб якими він буде керувати)</div>
+                        <select id="subordinates-count" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                            <option value="" disabled selected>Оберіть кількість...</option>
+                            <option value="Немає підлеглих">Немає підлеглих</option>
+                            <option value="до 10">до 10</option>
+                            <option value="від 10 до 20">від 10 до 20</option>
+                            <option value="від 20 до 50">від 20 до 50</option>
+                            <option value="від 50 до 70">від 50 до 70</option>
+                            <option value="від 70 до 100">від 70 до 100</option>
+                            <option value="більше 100+">більше 100+</option>
+                        </select>
                     </div>
                 </div>
                 <div>
-                    <div class="order-field-label">Аудиторія</div>
-                    <div id="detail-audience" style="font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);"></div>
+                    <div class="field-label">Ключові функції (Обов'язки на посаді)</div>
+                    <textarea id="job-functions" placeholder="Опишіть головні завдання, які виконуватиме працівник..." class="w-full p-4 rounded-xl glass-input text-[15px] h-24 resize-none"></textarea>
                 </div>
-                <div>
-                    <div class="order-field-label">Технічне завдання</div>
-                    <div id="detail-tz" class="order-field-value" style="line-height:1.7;"></div>
-                </div>
-                <div>
-                    <div class="order-field-label">Матеріали</div>
-                    <div id="detail-materials" style="font-size:13px;color:#94a3b8;"></div>
-                </div>
-                <div id="detail-link-row" class="hidden">
-                    <div class="order-field-label">Посилання на файли</div>
-                    <div id="detail-link" style="font-size:13px;color:#60a5fa;word-break:break-all;"></div>
-                </div>
-                <div id="detail-cancel-block" class="hidden">
-                    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:12px;padding:12px;margin-bottom:12px;">
-                        <div id="detail-cancel-date" style="display:flex;align-items:center;gap:6px;color:#f87171;font-weight:700;font-size:13px;margin-bottom:6px;"></div>
-                        <div class="order-field-label" style="margin-bottom:4px;">Причина скасування:</div>
-                        <div id="detail-cancel-reason" class="order-field-value" style="font-style:italic;opacity:0.8;"></div>
-                    </div>
-                </div>
-                <div>
-                    <div class="order-field-label">📝 Коментар від офісу</div>
-                    <div id="detail-office-comment" style="font-size:13px;color:#cbd5e1;background:rgba(255,255,255,0.03);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);min-height:40px;"></div>
-                </div>
+                <button onclick="goToPage4()" class="btn-primary mt-2">Продовжити →</button>
             </div>
         </div>
-        <div id="detail-cancel-btn-wrap"></div>
+
+        <div id="page-4" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-3b')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Причина та умови</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Причина та оплата</span><span>3 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-4">
+                <div>
+                    <div class="field-label">Причина пошуку</div>
+                    <select id="search-reason" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть причину...</option>
+                        <option value="Звільнення працівника (заміна)">Звільнення працівника (заміна)</option>
+                        <option value="Відкриття нової посади">Відкриття нової посади</option>
+                        <option value="Декретна відпустка">Декретна відпустка</option>
+                        <option value="Планове розширення штату">Планове розширення штату</option>
+                        <option value="Сезонне розширення">Сезонне розширення штату</option>
+                        <option value="Створення нового відділу">Створення нового відділу</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="field-label">Пріоритет закриття вакансії</div>
+                    <select id="priority" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть пріоритет...</option>
+                        <option value="Стандартний">🔵 Стандартний</option>
+                        <option value="Терміновий">🔴 Терміновий</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="field-label">ЗП на випробувальний термін (₴)</div>
+                    <input type="text" inputmode="numeric" id="salary-probation" placeholder="Напр: 22000" class="w-full p-4 rounded-xl glass-input text-[15px]" oninput="digitsOnly(this)">
+                </div>
+                <div>
+                    <div class="field-label">ЗП після випробувального терміну (₴)</div>
+                    <input type="text" inputmode="numeric" id="salary-after" placeholder="Напр: 25000" class="w-full p-4 rounded-xl glass-input text-[15px]" oninput="digitsOnly(this)">
+                </div>
+                <div>
+                    <div class="field-label">Тривалість випробувального терміну</div>
+                    <select id="probation-duration" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть термін...</option>
+                        <option value="Без випробувального терміну">Без випробувального терміну</option>
+                        <option value="1 місяць">1 місяць</option>
+                        <option value="2 місяці">2 місяці</option>
+                        <option value="3 місяці">3 місяці (Стандарт)</option>
+                        <option value="6 місяців">6 місяців</option>
+                    </select>
+                </div>
+                <button onclick="goToPage5()" class="btn-primary mt-2">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-5" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-4')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Профіль кандидата</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Вік та Освіта</span><span>4 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <div class="field-label">Вік від</div>
+                        <select id="candidate-age-from" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none cursor-pointer">
+                            <option value="" disabled selected>Виберіть вік</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div class="field-label">Вік до</div>
+                        <select id="candidate-age-to" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none cursor-pointer">
+                            <option value="" disabled selected>Виберіть вік</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <div class="field-label">Рівень освіти</div>
+                    <select id="candidate-education" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть рівень освіти...</option>
+                        <option value="Середня">Середня</option>
+                        <option value="Середня спеціальна / Технічна">Середня спеціальна / Технічна</option>
+                        <option value="Незакінчена вища">Незакінчена вища</option>
+                        <option value="Вища">Вища</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="field-label">Спеціальність</div>
+                    <input type="text" id="candidate-specialty" placeholder="Напр: Менеджмент, Економіка..." class="w-full p-4 rounded-xl glass-input text-[15px]" oninput="lettersOnly(this)">
+                </div>
+                <button onclick="goToPage5b()" class="btn-primary mt-2">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-5b" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-5')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Досвід роботи</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Досвід роботи</span><span>5 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl flex flex-col h-[55vh]">
+                <div class="field-label mb-2">Досвід роботи (сфери, компанії, рівень посади)</div>
+                <textarea id="candidate-experience" placeholder="Детально опишіть вимоги до досвіду кандидата..." class="w-full flex-1 p-4 rounded-xl glass-input resize-none text-[15px] leading-relaxed"></textarea>
+                <button onclick="goToPage5c()" class="btn-primary mt-4">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-5c" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-5b')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Знання та навички</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Професійні знання та вміння</span><span>6 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl flex flex-col h-[55vh]">
+                <div class="field-label mb-2">Професійні знання, вміння, навички</div>
+                <textarea id="candidate-skills" placeholder="Напишіть, якими професійними навичками повинен володіти кандидат..." class="w-full flex-1 p-4 rounded-xl glass-input resize-none text-[15px] leading-relaxed"></textarea>
+                <button onclick="goToPage6()" class="btn-primary mt-4">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-6" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-5c')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Знання мов та ПК</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Мови, ПК та Програми</span><span>7 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-4 max-h-[65vh] overflow-y-auto custom-scroll">
+                <div>
+                    <div class="field-label">Знання мов та рівень володіння</div>
+                    <div id="languages-container" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addLanguageRow()" class="flex items-center gap-1 text-xs text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-2 rounded-xl transition-all font-semibold">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Додати мову
+                    </button>
+                </div>
+
+                <div>
+                    <div class="field-label">Рівень володіння ПК</div>
+                    <select id="candidate-pc" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none">
+                        <option value="" disabled selected>Оберіть рівень володіння ПК...</option>
+                        <option value="Базовий рівень">Базовий рівень</option>
+                        <option value="Впевнений користувач">Впевнений користувач</option>
+                        <option value="Просунутий / Експерт">Просунутий / Експерт</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="field-label">Спеціалізовані програми</div>
+                    <select id="need-programs" class="w-full p-4 rounded-xl glass-input text-[15px] appearance-none" onchange="toggleProgramsField(this)">
+                        <option value="" disabled selected>Оберіть відповідь...</option>
+                        <option value="yes">✅ Так, потрібні</option>
+                        <option value="no">❌ Ні, не потрібні</option>
+                    </select>
+                    <div id="custom-programs-wrap" class="hidden" style="margin-top:10px;">
+                        <input type="text" id="custom-programs" placeholder="Введіть софт через кому (напр: 1С, Excel, SAP)..." class="w-full p-4 rounded-xl glass-input text-[15px] animate-fade">
+                    </div>
+                </div>
+
+                <button onclick="goToPage6b()" class="btn-primary w-full mt-2">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-6b" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-6')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Якості кандидата</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Особисті якості</span><span>8 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl flex flex-col h-[55vh]">
+                <div class="field-label mb-2">Особисті якості кандидата</div>
+                <textarea id="candidate-traits" placeholder="Напр: Чесність, пунктуальність, комунікабельність..." class="w-full flex-1 p-4 rounded-xl glass-input resize-none text-[15px] leading-relaxed"></textarea>
+                <button onclick="goToPage7()" class="btn-primary mt-4">Продовжити →</button>
+            </div>
+        </div>
+
+        <div id="page-7" class="page-section hidden">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-6b')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Контроль процесу</h2>
+            </div>
+            <div class="progress-wrap pb-5">
+                <div class="progress-steps">
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step done"></div>
+                    <div class="progress-step active"></div>
+                    <div class="progress-step idle"></div>
+                </div>
+                <div class="progress-label"><span class="current-step">Контактна особа</span><span>9 / 10</span></div>
+            </div>
+
+            <div class="glass p-5 rounded-2xl space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">Вкажіть інформацію про відповідальну особу, яка контролює хід підбору кадрів.</p>
+                <div>
+                    <div class="field-label">Контактна особа (П.І.Б.)</div>
+                    <input type="text" id="contact-fio" placeholder="Іванов Іван Іванович" class="w-full p-4 rounded-xl glass-input text-[15px]" oninput="lettersOnly(this)">
+                </div>
+                <div>
+                    <div class="field-label">Контактний номер телефону</div>
+                    <input type="tel" id="contact-phone" placeholder="38 0__ ___ __ __" class="w-full p-4 rounded-xl glass-input text-[15px]">
+                </div>
+                <div>
+                    <div class="field-label">Контактний E-mail</div>
+                    <input type="email" id="contact-email" placeholder="example@company.com" class="w-full p-4 rounded-xl glass-input text-[15px]">
+                </div>
+                <button onclick="renderSummary()" class="w-full bg-emerald-600 hover:bg-emerald-500 p-4 rounded-xl font-semibold text-white transition-all mt-2">Перевірити повну заявку</button>
+            </div>
+        </div>
+
+        <div id="page-8" class="page-section hidden w-full pb-10">
+            <div class="page-header">
+                <button class="btn-back" onclick="showPage('page-7')"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h2 class="text-gradient">Перевірка та підтвердження</h2>
+            </div>
+
+            <div class="glass p-5 rounded-2xl text-[14px] leading-relaxed shadow-lg relative overflow-hidden w-full max-h-[70vh] overflow-y-auto custom-scroll">
+                <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-indigo-500/20 rounded-lg"><i data-lucide="file-check" class="text-indigo-400 w-5 h-5"></i></div>
+                    <span class="font-bold text-base text-indigo-300">Картка вакансії (Excel формат)</span>
+                </div>
+
+                <div class="summary-section-title">Структура та Керівництво</div>
+                <div class="summary-row"><span class="summary-label">Департамент/Відділ:</span> <span id="sum-dept" class="summary-val font-medium text-white text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Керівник:</span> <span id="sum-manager" class="summary-val font-medium text-white text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Узгоджено з керівником:</span> <span id="sum-approved" class="summary-val font-semibold text-emerald-400"></span></div>
+
+                <div class="summary-section-title">Деталі Посади</div>
+                <div class="summary-row"><span class="summary-label">Вакантна посада:</span> <span id="sum-title" class="summary-val font-bold text-white text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Кількість вакансій:</span> <span id="sum-v-count" class="summary-val"></span></div>
+                <div class="summary-row"><span class="summary-label">Підлеглі у посади:</span> <span id="sum-sub-count" class="summary-val"></span></div>
+
+                <div class="text-[11px] text-slate-500 mt-2">Ключові функції на посаді:</div>
+                <div id="sum-functions" class="summary-block-text"></div>
+
+                <div class="summary-section-title">Причина пошуку та умови</div>
+                <div class="summary-row"><span class="summary-label">Причина пошуку:</span> <span id="sum-reason" class="summary-val text-amber-400 text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Пріоритет:</span> <span id="sum-prio" class="summary-val"></span></div>
+                <div class="summary-row"><span class="summary-label">ЗП (Випроб. термін):</span> <span id="sum-sal-prob" class="summary-val text-emerald-400"></span></div>
+                <div class="summary-row"><span class="summary-label">ЗП (Після випробув.):</span> <span id="sum-sal-after" class="summary-val text-emerald-400"></span></div>
+                <div class="summary-row"><span class="summary-label">Випробув. термін:</span> <span id="sum-prob-dur" class="summary-val"></span></div>
+
+                <div class="summary-section-title">Вимоги до кандидата</div>
+                <div class="summary-row"><span class="summary-label">Бажаний вік:</span> <span id="sum-age" class="summary-val"></span></div>
+                <div class="summary-row"><span class="summary-label">Рівень освіти:</span> <span id="sum-edu" class="summary-val text-white text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Спеціальність:</span> <span id="sum-specialty" class="summary-val text-white text-right"></span></div>
+
+                <div class="text-[11px] text-slate-500 mt-2">Досвід роботи:</div>
+                <div id="sum-exp" class="summary-block-text"></div>
+
+                <div class="text-[11px] text-slate-500 mt-2">Знання та навички:</div>
+                <div id="sum-skills" class="summary-block-text"></div>
+
+                <div class="summary-row mt-2"><span class="summary-label">Знання мов (Рівні):</span> <span id="sum-lang-levels" class="summary-val text-right"></span></div>
+                <div class="summary-row"><span class="summary-label">Володіння ПК:</span> <span id="sum-pc" class="summary-val"></span></div>
+                <div class="summary-row"><span class="summary-label">Спеціалізований софт:</span> <span id="sum-programs" class="summary-val text-right"></span></div>
+
+                <div class="text-[11px] text-slate-500 mt-2">Особисті якості:</div>
+                <div id="sum-traits" class="summary-block-text"></div>
+
+                <div class="summary-section-title">Контроль та зв'язок</div>
+                <div class="summary-row"><span class="summary-label">Куратор процесу:</span> <span id="sum-c-fio" class="summary-val text-blue-400"></span></div>
+                <div class="summary-row"><span class="summary-label">Телефон / E-mail:</span> <span id="sum-c-contacts" class="summary-val text-white text-xs"></span></div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="showPage('page-3')" class="flex-1 bg-slate-700/50 p-4 rounded-xl font-semibold text-white">Редагувати з нуля</button>
+                <button onclick="fakeSubmit()" class="flex-1 bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-semibold text-white flex justify-center items-center gap-2 shadow-lg">
+                    <i data-lucide="send" class="w-5 h-5"></i> Надіслати в HR
+                </button>
+            </div>
+        </div>
+
+        <div id="page-success" class="page-section hidden pt-16 text-center">
+            <div class="w-20 h-20 bg-emerald-500/10 border-2 border-emerald-500/30 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-xl shadow-emerald-500/5">✅</div>
+            <h2 class="text-2xl font-bold text-emerald-400 mb-2">Заявку сформовано!</h2>
+            <p class="text-sm text-slate-400 mb-8 max-w-xs mx-auto leading-relaxed">Всі стовпчики згідно з регламентом успішно оброблені. Заявка готова для передачі в Google Таблицю.</p>
+            <button onclick="showPage('page-1')" class="w-full bg-blue-600 p-4 rounded-xl font-semibold text-white">На головну сторінку</button>
+        </div>
+
     </div>
 
-    <!-- ══════════════════════ PAGE: CANCEL SUCCESS ══════════════════════ -->
-    <div id="page-cancel-success" class="page-section hidden" style="padding-top:60px;text-align:center;">
-        <div style="width:80px;height:80px;border-radius:50%;background:rgba(239,68,68,0.1);border:2px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px;box-shadow:0 0 40px rgba(239,68,68,0.2);" class="animate-pop">❌</div>
-        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#f87171;margin-bottom:6px;">Заявку скасовано</div>
-        <div style="font-size:14px;color:#64748b;margin-bottom:28px;">Статус оновлено в системі</div>
-        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:14px;text-align:center;margin-bottom:20px;">
-            <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Скасована заявка</div>
-            <div id="cancel-success-order-id" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f87171;">—</div>
-        </div>
-        <div style="display:flex;gap:10px;">
-            <button onclick="loadOrders('Скасована')" class="btn-primary btn-secondary" style="flex:1;">Скасовані</button>
-            <button onclick="showPage('page-1')" class="btn-primary" style="flex:1;background:linear-gradient(135deg,#7f1d1d,#991b1b);box-shadow:0 6px 20px rgba(153,27,27,0.3);">На головну</button>
-        </div>
-    </div>
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if(tg) { tg.expand(); }
 
-</div><!-- /page-wrap -->
-
-<script>
-    const tg = window.Telegram?.WebApp;
-
-    if (tg) {
-        tg.expand();
-        tg.disableClosingConfirmation();
-        try { tg.setHeaderColor('#060a12'); tg.setBackgroundColor('#060a12'); } catch(e) {}
-        try { tg.isVerticalSwipesEnabled = false; } catch(e) {}
-    }
-
-    const TELEGRAM_ID = tg?.initDataUnsafe?.user?.id || "BROWSER_TEST_MODE";
-    let currentCancellingOrderId = null;
-
-    // Telegram back button
-    const PAGE_BACK_MAP = {
-        'page-2':              'page-1',
-        'page-3':              'page-1',
-        'page-4':              'page-3',
-        'page-6':              'page-4',
-        'page-7':              'page-6',
-        'page-my-orders-menu':'page-1',
-        'page-orders-list':   'page-my-orders-menu',
-        'page-cancel-reason': 'page-orders-list',
-        'page-order-detail':  'page-orders-list',
-        'page-success':        null,
-        'page-cancel-success': null,
-    };
-    let currentPageId = 'page-1';
-
-    function updateBackButton(pageId) {
-        if (!tg?.BackButton) return;
-        pageId !== 'page-1' ? tg.BackButton.show() : tg.BackButton.hide();
-    }
-
-    if (tg?.BackButton) {
-        tg.BackButton.onClick(() => {
-            const dest = PAGE_BACK_MAP[currentPageId];
-            if (dest === null) showPage('page-1');
-            else if (dest) showPage(dest);
-        });
-    }
-
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz5NP0TFJXzXERMbYGLDJqFUrdKCPyj5xi-SACsolDVP7YMQokzIBkg-XkRYvsSM9_ubQ/exec";
-
-    function vibrate(style = 'light') {
-        if (tg?.HapticFeedback) {
-            ['error','success','warning'].includes(style)
-                ? tg.HapticFeedback.notificationOccurred(style)
-                : tg.HapticFeedback.impactOccurred(style);
-        }
-    }
-
-    // iOS keyboard & touch handling
-    function dismissKeyboard() {
-        const el = document.activeElement;
-        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) el.blur();
-    }
-
-    let _pendingBtn = null;
-    document.addEventListener('touchstart', function(e) {
-        const btn = e.target.closest('button');
-        if (!btn || btn.disabled) return;
-        dismissKeyboard();
-        _pendingBtn = btn;
-    }, { passive: true });
-    document.addEventListener('touchend', function(e) {
-        const btn = e.target.closest('button');
-        if (!btn || btn.disabled || btn !== _pendingBtn) { _pendingBtn = null; return; }
-        _pendingBtn = null;
-        e.preventDefault();
-        btn.click();
-    }, { passive: false });
-    document.addEventListener('touchcancel', function() { _pendingBtn = null; }, { passive: true });
-
-    document.addEventListener('touchstart', function(e) {
-        if (!e.target.closest('input, textarea, select')) document.activeElement?.blur();
-    }, { passive: true });
-
-    document.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-        }
-    });
-
-    lucide.createIcons();
-
-    // YN state
-    const ynState = { media: 'no' };
-
-    function selectYN(type, val) {
-        vibrate('light');
-        ynState[type] = val;
-        ['yes','no'].forEach(v => {
-            const el = document.getElementById(`yn-${type}-${v}`);
-            el.classList.remove('active');
-            if (v === val) el.classList.add('active');
-        });
-        const wrap = document.getElementById('materials-link-wrap');
-        ynState.media === 'yes' ? wrap.classList.remove('hidden') : wrap.classList.add('hidden');
-        lucide.createIcons();
-    }
-
-    // Format chips
-    function checkOtherFormat(sel) {
-        const wrap = document.getElementById('other-format-wrap');
-        if (sel.value === 'other') {
-            wrap.classList.remove('hidden');
-            document.getElementById('format').value = '';
-            setTimeout(() => document.getElementById('other-format').focus(), 100);
-        } else {
-            wrap.classList.add('hidden');
-            document.getElementById('format').value = sel.value;
-        }
-    }
-
-    // Audience chips
-    function checkOtherAudience(sel) {
-        const wrap = document.getElementById('custom-audience-wrap');
-        if (sel.value === 'other') {
-            document.getElementById('audience').value = '';
-            wrap.classList.remove('hidden');
-            setTimeout(() => document.getElementById('custom-audience').focus(), 100);
-        } else {
-            document.getElementById('audience').value = sel.value;
-            wrap.classList.add('hidden');
-        }
-    }
-
-    // Dates
-    function getFormattedDateTime() {
-        const n = new Date();
-        const pad = v => String(v).padStart(2,'0');
-        return `${pad(n.getDate())}.${pad(n.getMonth()+1)}.${String(n.getFullYear()).slice(-2)}/${pad(n.getHours())}:${pad(n.getMinutes())}`;
-    }
-
-    function formatToShortDate(s) {
-        if (!s) return '';
-        if (s.includes('T')) {
-            const d = new Date(s);
-            return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getFullYear()).slice(-2)}`;
-        }
-        if (s.includes('-')) {
-            const [y,m,d] = s.split('-');
-            return `${d}.${m}.${y.slice(-2)}`;
-        }
-        return s;
-    }
-
-    // Profile preview
-    function updateProfilePreview() {
-        const fio   = (document.getElementById('user-fio')?.value || '').trim();
-        const phone = (document.getElementById('user-phone')?.value || '').trim();
-        const parts = fio.split(' ').filter(Boolean);
-        const initials = parts.length >= 2
-            ? (parts[0][0] + parts[1][0]).toUpperCase()
-            : fio.length >= 2 ? fio.substring(0,2).toUpperCase() : (fio[0] || '?').toUpperCase();
-        const avatarEl = document.getElementById('profile-avatar-text');
-        const nameEl   = document.getElementById('profile-name-display');
-        const phoneEl  = document.getElementById('profile-phone-display');
-        if (avatarEl) avatarEl.textContent = initials;
-        if (nameEl)   nameEl.textContent   = fio || '—';
-        if (phoneEl)  phoneEl.textContent  = phone || 'Не заповнено';
-    }
-
-    // Page navigation
-    function showPage(id) {
-        vibrate('light');
-        currentPageId = id;
-        updateBackButton(id);
-        document.querySelectorAll('.page-section').forEach(p => { p.classList.add('hidden'); p.classList.remove('animate-fade'); });
-        const pg = document.getElementById(id);
-        pg.classList.remove('hidden');
-        void pg.offsetWidth;
-        pg.classList.add('animate-fade');
-        window.scrollTo({ top: 0, behavior: 'instant' });
-
-        if (id === 'page-2') {
-            document.getElementById('user-fio').value   = localStorage.getItem('fio') || '';
-            document.getElementById('user-phone').value = localStorage.getItem('phone') || '';
-            updateProfilePreview();
-        }
-        if (id === 'page-7') renderSummary();
-        if (id === 'page-1') loadHomeStats();
-        if (id === 'page-my-orders-menu') loadMenuStats();
-        lucide.createIcons();
-    }
-
-    function startNewRequest() { localStorage.getItem('fio') ? showPage('page-3') : showPage('page-2'); }
-    function openProfileFromMenu() { showPage('page-2'); }
-
-    // Validation
-    function validateFields(fieldIds) {
-        let valid = true;
-        fieldIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            let empty = !el.value || el.value.trim() === '' || el.value === 'empty';
-            if (id === 'user-phone' || id === 'target-phone') {
-                if (!empty && el.value.length < 16) empty = true;
-            }
-            if (empty) { el.classList.add('error-input'); valid = false; }
-            else        { el.classList.remove('error-input'); }
-        });
-        if (!valid) {
-            vibrate('error');
-            if (tg?.showAlert) tg.showAlert("❗️ Заповніть всі обов'язкові поля коректно!");
-            else alert("❗️ Заповніть всі обов'язкові поля!");
-        }
-        return valid;
-    }
-
-    function saveProfile() {
-        dismissKeyboard();
-        if (!validateFields(['user-fio','user-phone'])) return;
-        localStorage.setItem('fio', document.getElementById('user-fio').value.trim());
-        localStorage.setItem('phone', document.getElementById('user-phone').value.trim());
-        showPage('page-1');
-    }
-
-    function goToPage4() {
-        dismissKeyboard();
-        if (!validateFields(['topic','deadline'])) return;
-        const sel = document.getElementById('audience-select');
-        if (!sel.value) {
-            sel.classList.add('error-input');
-            vibrate('error');
-            if (tg?.showAlert) tg.showAlert("❗️ Оберіть цільову аудиторію");
-            else alert("❗️ Оберіть цільову аудиторію");
-            return;
-        }
-        if (sel.value === 'other') {
-            const customEl = document.getElementById('custom-audience');
-            if (!customEl.value.trim()) {
-                customEl.classList.add('error-input');
-                vibrate('error');
-                if (tg?.showAlert) tg.showAlert("❗️ Вкажіть цільову аудиторію");
-                else alert("❗️ Вкажіть цільову аудиторію");
-                return;
-            }
-            document.getElementById('audience').value = customEl.value.trim();
-        } else {
-            document.getElementById('audience').value = sel.value;
-        }
-        showPage('page-4');
-    }
-
-    function goToPage5() {
-        dismissKeyboard();
-        const sel = document.getElementById('format-select');
-        if (!sel.value) {
-            sel.classList.add('error-input');
-            vibrate('error');
-            if (tg?.showAlert) tg.showAlert("❗️ Оберіть формат контенту");
-            else alert("❗️ Оберіть формат контенту");
-            return;
-        }
-        if (sel.value === 'other') {
-            const otherEl = document.getElementById('other-format');
-            if (!otherEl.value.trim()) {
-                otherEl.classList.add('error-input');
-                vibrate('error');
-                if (tg?.showAlert) tg.showAlert("❗️ Опишіть формат контенту");
-                else alert("❗️ Опишіть формат контенту");
-                return;
-            }
-            document.getElementById('format').value = otherEl.value.trim();
-        } else {
-            document.getElementById('format').value = sel.value;
-        }
-        if (validateFields(['tz'])) showPage('page-6');
-    }
-
-    function goToPage7() {
-        dismissKeyboard();
-        const anyYes = ynState.media === 'yes';
-        if (anyYes) {
-            const linkEl = document.getElementById('materials-link');
-            const linkValue = linkEl.value.trim();
-            
-            if (!linkValue) {
-                linkEl.classList.add('error-input');
-                vibrate('error');
-                if (tg?.showAlert) tg.showAlert("❗️ Додайте посилання на матеріали або оберіть «Ні»");
-                else alert("❗️ Додайте посилання на матеріали");
-                return;
-            }
-            
-            // Простая перевірка - має починатися з http:// або https://
-            if (!linkValue.startsWith('http://') && !linkValue.startsWith('https://')) {
-                linkEl.classList.add('error-input');
-                vibrate('error');
-                if (tg?.showAlert) tg.showAlert("❗️ Посилання має починатися з http:// або https://");
-                else alert("❗️ Посилання має починатися з http:// або https://");
-                return;
-            }
-        }
-        showPage('page-7');
-    }
-
-    function renderSummary() {
-        const anyYes = ynState.media === 'yes';
-        document.getElementById('sum-fio').textContent          = localStorage.getItem('fio') || '—';
-        document.getElementById('sum-phone').textContent        = localStorage.getItem('phone') || '—';
-        document.getElementById('sum-date-created').textContent = getFormattedDateTime();
-        document.getElementById('sum-topic').textContent        = document.getElementById('topic').value || '—';
-        document.getElementById('sum-deadline').textContent     = formatToShortDate(document.getElementById('deadline').value) || '—';
-        document.getElementById('sum-format').textContent       = document.getElementById('format').value || '—';
-        document.getElementById('sum-audience').textContent     = document.getElementById('audience').value || '—';
-        document.getElementById('sum-tz').textContent           = document.getElementById('tz').value || '—';
-        document.getElementById('sum-media').textContent        = ynState.media === 'yes' ? '✅ Так' : '—';
-        document.getElementById('sum-media').style.color        = ynState.media === 'yes' ? '#34d399' : '#64748b';
-
-        const linkRow = document.getElementById('sum-link-row');
-        if (anyYes) {
-            document.getElementById('sum-link').textContent = document.getElementById('materials-link').value;
-            linkRow.classList.remove('hidden');
-        } else {
-            linkRow.classList.add('hidden');
-        }
-    }
-
-    function submitForm() {
-        dismissKeyboard();
-        vibrate('medium');
-        const btn = document.getElementById('btn-submit');
-        btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;margin:0;"></div> Відправка...';
-        btn.disabled = true;
-
-        const anyYes = ynState.media === 'yes';
-
-        const payload = {
-            action:         'create_content_request',
-            timestamp:      document.getElementById('sum-date-created').textContent,
-            fio:            localStorage.getItem('fio'),
-            phone:          localStorage.getItem('phone'),
-            topic:          document.getElementById('topic').value,
-            deadline:       formatToShortDate(document.getElementById('deadline').value),
-            format:         document.getElementById('format').value,
-            audience:       document.getElementById('audience').value,
-            tz:             document.getElementById('tz').value,
-            has_media:      ynState.media,
-            materials_link: anyYes ? document.getElementById('materials-link').value : '',
-            telegram_id:    TELEGRAM_ID
+        const PAGE_BACK_MAP = {
+            'page-2': 'page-1',
+            'page-3': 'page-1',
+            'page-3b': 'page-3',
+            'page-4': 'page-3b',
+            'page-5': 'page-4',
+            'page-5b': 'page-5',
+            'page-5c': 'page-5b',
+            'page-6': 'page-5c',
+            'page-6b': 'page-6',
+            'page-7': 'page-6b',
+            'page-8': 'page-7',
         };
 
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow'
-        })
-        .then(r => r.json())
-        .then(data => {
-            vibrate('success');
-            document.getElementById('success-order-id').textContent = '№ ' + (data.orderId || '—');
-            resetForm();
-            showPage('page-success');
-        })
-        .catch(() => {
-            vibrate('success');
-            document.getElementById('success-order-id').textContent = '—';
-            resetForm();
-            showPage('page-success');
-        })
-        .finally(() => {
-            btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Відправити';
-            btn.disabled = false;
-            lucide.createIcons();
-        });
-    }
-
-    function resetForm() {
-        ['topic','tz','materials-link','custom-audience'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        document.getElementById('deadline').value = '';
-        document.getElementById('format').value = '';
-        document.getElementById('format-select').value = '';
-        document.getElementById('other-format').value = '';
-        document.getElementById('other-format-wrap').classList.add('hidden');
-        document.getElementById('audience').value = '';
-        document.getElementById('audience-select').value = '';
-        document.getElementById('audience').value = '';
-        document.getElementById('custom-audience-wrap').classList.add('hidden');
-        ynState.media = 'no';
-        selectYN('media','no');
-    }
-
-    // Orders
-    function loadOrders(statusFilter) {
-        const phone = localStorage.getItem('phone');
-        if (!phone) {
-            vibrate('warning');
-            if (tg?.showAlert) tg.showAlert("Спочатку заповніть профіль!");
-            else alert("Заповніть профіль!");
-            showPage('page-2'); return;
+        if (tg?.BackButton) {
+            tg.BackButton.onClick(() => {
+                const dest = PAGE_BACK_MAP[currentPageId];
+                if (dest) showPage(dest);
+                else tg.BackButton.hide();
+            });
         }
 
-        const titles = { 'Активна':'Активні', 'Скасована':'Скасовані', 'Виконані':'Виконані', 'Архів':'Архів' };
-        document.getElementById('orders-list-title').textContent = titles[statusFilter] || statusFilter;
-        showPage('page-orders-list');
-        document.getElementById('orders-loading').classList.remove('hidden');
-        document.getElementById('orders-container').classList.add('hidden');
-        document.getElementById('orders-container').innerHTML = '';
-
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_content_requests', phone, telegram_id: TELEGRAM_ID }),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow'
-        })
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('orders-loading').classList.add('hidden');
-            document.getElementById('orders-container').classList.remove('hidden');
-
-            if (data.status === 'success' && data.orders) {
-                const list = data.orders.filter(o => o.status === statusFilter);
-                if (!list.length) {
-                    document.getElementById('orders-container').innerHTML = `
-                        <div style="text-align:center;padding:48px 16px;color:#475569;">
-                            <div style="font-size:40px;margin-bottom:12px;opacity:0.5;">📭</div>
-                            <p style="font-size:14px;">Заявок у цій категорії немає</p>
-                        </div>`;
-                    lucide.createIcons(); return;
-                }
-
-                list.forEach(o => {
-                    const stripeColor = statusFilter === 'Активна' ? '#8b5cf6' : (statusFilter === 'Скасована' ? '#ef4444' : '#10b981');
-                    const badge = statusFilter === 'Активна'
-                        ? `<span class="badge badge-active" style="background:rgba(139,92,246,0.12);color:#a78bfa;border-color:rgba(139,92,246,0.25);">● Активна</span>`
-                        : statusFilter === 'Скасована'
-                            ? `<span class="badge badge-cancel">✕ Скасована</span>`
-                            : `<span class="badge badge-active">✓ Виконана</span>`;
-
-                    let extra = '';
-                    if (statusFilter === 'Активна') {
-                        extra = `
-                            <div style="height:1px;background:rgba(255,255,255,0.05);margin:12px 0;"></div>
-                            <div class="order-field-label">Тема:</div>
-                            <div class="order-field-value" style="margin-bottom:12px;">${o.topic || '—'}</div>
-                            <div style="display:flex;gap:8px;">
-                                <button onclick="openOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})" class="btn-primary" style="flex:1;font-size:13px;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(59,130,246,0.15));border:1px solid rgba(139,92,246,0.3);box-shadow:none;">
-                                    <i data-lucide="eye" class="w-4 h-4"></i> Детально
-                                </button>
-                                <button onclick="openCancelPage('${o.orderId}')" class="btn-primary btn-danger" style="flex:1;font-size:13px;padding:11px;">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i> Скасувати
-                                </button>
-                            </div>`;
-                    } else {
-                        extra = `
-                            <div style="height:1px;background:rgba(255,255,255,0.05);margin:12px 0;"></div>
-                            <div class="order-field-label">Тема:</div>
-                            <div class="order-field-value" style="margin-bottom:12px;">${o.topic || '—'}</div>
-                            <div class="order-field-label">📝 Коментар від офісу:</div>
-                            <div class="order-field-value" style="margin-bottom:12px;font-size:12px;color:#94a3b8;">${o.office_comment || '(нема коментарів)'}</div>
-                            <button onclick="openOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})" class="btn-primary" style="width:100%;font-size:13px;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(59,130,246,0.1));border:1px solid rgba(139,92,246,0.25);box-shadow:none;">
-                                <i data-lucide="eye" class="w-4 h-4"></i> Детально
-                            </button>`;
-                    }
-
-                    document.getElementById('orders-container').innerHTML += `
-                        <div class="order-card animate-fade">
-                            <div class="order-card-stripe" style="background:${stripeColor};"></div>
-                            <div class="order-card-body">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                                    <div class="order-id">№ ${o.orderId}</div>
-                                    ${badge}
-                                </div>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-                                    <div class="order-chip">📅 Дедлайн: <span>${formatToShortDate(o.deadline)}</span></div>
-                                    <div class="order-chip">🎨 <span>${o.format || '—'}</span></div>
-                                    <div class="order-chip">👥 <span>${o.audience || '—'}</span></div>
-                                </div>
-                                ${extra}
-                            </div>
-                        </div>`;
-                });
-                lucide.createIcons();
-            } else {
-                if (tg?.showAlert) tg.showAlert("Помилка завантаження.");
-            }
-        })
-        .catch(() => {
-            document.getElementById('orders-loading').innerHTML = `
-                <div style="text-align:center;padding:32px;">
-                    <div style="font-size:36px;margin-bottom:10px;">📡</div>
-                    <p style="color:#f87171;font-size:13px;">Помилка з'єднання</p>
-                </div>`;
-        });
-    }
-
-    function openOrderDetail(o) {
-        vibrate('light');
-        const isActive   = o.status === 'Активна';
-        const isCanceled = o.status === 'Скасована';
-        const stripeColor = isActive ? '#8b5cf6' : (isCanceled ? '#ef4444' : '#10b981');
-        document.getElementById('detail-stripe').style.background = stripeColor;
-        document.getElementById('detail-id').textContent  = '№ ' + o.orderId;
-        document.getElementById('detail-id').style.color  = isActive ? '#a78bfa' : (isCanceled ? '#f87171' : '#34d399');
-
-        const badgeHtml = isActive
-            ? `<span class="badge" style="background:rgba(139,92,246,0.12);color:#a78bfa;border:1px solid rgba(139,92,246,0.25);">● Активна</span>`
-            : isCanceled
-                ? `<span class="badge badge-cancel">✕ Скасована</span>`
-                : `<span class="badge badge-active">✓ Виконана</span>`;
-        document.getElementById('detail-badge').innerHTML = badgeHtml;
-
-        document.getElementById('detail-chips').innerHTML = `
-            <div class="order-chip">📅 Дедлайн: <span>${formatToShortDate(o.deadline)}</span></div>
-            <div class="order-chip">🎨 <span>${o.format || '—'}</span></div>
-            <div class="order-chip" style="font-size:10px;color:#94a3b8;">🕐 <span style="color:#64748b;">${o.timestamp || ''}</span></div>`;
-
-        document.getElementById('detail-fio').textContent      = o.fio || '—';
-        document.getElementById('detail-format').textContent   = o.format || '—';
-        document.getElementById('detail-deadline').textContent = formatToShortDate(o.deadline);
-        document.getElementById('detail-audience').textContent = o.audience || '—';
-        document.getElementById('detail-tz').textContent       = o.tz || '—';
-
-        document.getElementById('detail-materials').textContent = o.has_media === 'yes' ? '🎬 Медіафайли: Так' : 'Немає додаткових матеріалів';
-
-        const linkRow = document.getElementById('detail-link-row');
-        if (o.materials_link) {
-            document.getElementById('detail-link').textContent = o.materials_link;
-            linkRow.classList.remove('hidden');
-        } else {
-            linkRow.classList.add('hidden');
-        }
-
-        const cancelBlock = document.getElementById('detail-cancel-block');
-        if (isCanceled) {
-            cancelBlock.classList.remove('hidden');
-            document.getElementById('detail-cancel-date').innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i> Скасовано ${o.cancel_date || ''}`;
-            document.getElementById('detail-cancel-reason').textContent = o.cancel_reason || '—';
-        } else {
-            cancelBlock.classList.add('hidden');
-        }
-
-        document.getElementById('detail-office-comment').textContent = o.office_comment || '(нема коментарів)';
-        document.getElementById('detail-office-comment').style.color = o.office_comment ? '#cbd5e1' : '#64748b';
-        document.getElementById('detail-office-comment').style.opacity = o.office_comment ? '1' : '0.6';
-
-        const btnWrap = document.getElementById('detail-cancel-btn-wrap');
-        btnWrap.innerHTML = isActive
-            ? `<button onclick="openCancelPage('${o.orderId}')" class="btn-primary btn-danger" style="width:100%;margin-bottom:20px;"><i data-lucide="trash-2" class="w-4 h-4"></i> Скасувати заявку</button>`
-            : '';
-
-        showPage('page-order-detail');
+        let currentPageId = 'page-1';
         lucide.createIcons();
-    }
 
-    function openCancelPage(orderId) {
-        vibrate('medium');
-        currentCancellingOrderId = orderId;
-        document.getElementById('cancel-reason-text').value = '';
-        document.getElementById('cancel-reason-text').classList.remove('error-input');
-        showPage('page-cancel-reason');
-    }
+        window.addEventListener('DOMContentLoaded', () => {
+            const ageFromSelect = document.getElementById('candidate-age-from');
+            const ageToSelect = document.getElementById('candidate-age-to');
+            if(ageFromSelect && ageToSelect) {
+                for(let i = 16; i <= 60; i++) {
+                    let opt = document.createElement('option');
+                    opt.value = i; opt.innerText = i;
+                    ageFromSelect.appendChild(opt);
+                }
+                for(let i = 20; i <= 100; i++) {
+                    let opt = document.createElement('option');
+                    opt.value = i; opt.innerText = i;
+                    ageToSelect.appendChild(opt);
+                }
+            }
+        });
 
-    function submitCancellation() {
-        dismissKeyboard();
-        const field = document.getElementById('cancel-reason-text');
-        if (!field.value.trim()) {
-            vibrate('error'); field.classList.add('error-input');
-            if (tg?.showAlert) tg.showAlert("❗️ Детально поясніть причину скасування");
-            else alert("❗️ Детально поясніть причину скасування");
-            return;
+        function addLanguageRow(lang = "", level = "") {
+            const container = document.getElementById('languages-container');
+            const rowId = 'lang-row-' + Date.now() + Math.random().toString(36).substr(2, 5);
+
+            const languages = ["Українська", "Англійська", "Російська", "Німецька", "Польська", "Французька", "Іспанська", "Італійська", "Інша"];
+            const levels = ["A1 - Початковий", "A2 - Елементарний", "B1 - Середній", "B2 - Вище середнього", "C1 - Просунутий", "C2 - Вільне володіння"];
+
+            let langOptions = languages.map(l => `<option value="${l}" ${l === lang ? 'selected' : ''}>${l}</option>`).join('');
+            let levelOptions = levels.map(v => `<option value="${v}" ${v === level ? 'selected' : ''}>${v}</option>`).join('');
+
+            const rowHtml = `
+                <div id="${rowId}" class="flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5 animate-fade">
+                    <select class="flex-1 p-2 rounded-lg glass-input text-xs appearance-none cursor-pointer lang-select-val">
+                        <option value="" disabled ${!lang ? 'selected' : ''}>Мова...</option>
+                        ${langOptions}
+                    </select>
+                    <span class="text-slate-500 text-xs">—</span>
+                    <select class="flex-1 p-2 rounded-lg glass-input text-xs appearance-none cursor-pointer level-select-val">
+                        <option value="" disabled ${!level ? 'selected' : ''}>Рівень...</option>
+                        ${levels.map(lvl => `<option value="${lvl}" ${lvl.startsWith(level) || lvl === level ? 'selected' : ''}>${lvl}</option>`).join('')}
+                    </select>
+                    <button type="button" onclick="removeLanguageRow('${rowId}')" class="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
+            lucide.createIcons();
         }
-        vibrate('light');
 
-        document.getElementById('orders-loading').classList.remove('hidden');
-        document.getElementById('orders-container').classList.add('hidden');
-        showPage('page-orders-list');
+        function removeLanguageRow(id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+        }
 
-        const cancelledId = currentCancellingOrderId;
-        const officeComment = document.getElementById('cancel-office-comment').value.trim();
-        
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            body: JSON.stringify({ 
-                action: 'cancel_content_request', 
-                orderId: cancelledId, 
-                cancel_reason: field.value.trim(),
-                office_comment: officeComment
-            }),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow'
-        })
-        .then(r => r.json())
-        .then(() => {
-            vibrate('warning');
-            document.getElementById('cancel-success-order-id').textContent = '№ ' + cancelledId;
-            showPage('page-cancel-success');
-            // Автоматично завантажити список Скасованих через 2 секунди
-            setTimeout(() => {
-                loadOrders('Скасована');
-            }, 2000);
-        })
-        .catch(() => {
-            vibrate('warning');
-            document.getElementById('cancel-success-order-id').textContent = '№ ' + cancelledId;
-            showPage('page-cancel-success');
-            // Автоматично завантажити список Скасованих через 2 секунди
-            setTimeout(() => {
-                loadOrders('Скасована');
-            }, 2000);
-        });
-    }
+        addLanguageRow("Українська", "C2");
 
-    // Stats
-    function loadHomeStats() {
-        const phone = localStorage.getItem('phone');
-        if (!phone) return;
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_content_requests', phone, telegram_id: TELEGRAM_ID }),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow'
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.status === 'success' && data.orders) {
-                const active = data.orders.filter(o => o.status === 'Активна').length;
-                const done   = data.orders.filter(o => o.status === 'Виконані' || o.status === 'Архів').length;
-                const now = new Date();
-                const month = data.orders.filter(o => {
-                    if (!o.timestamp) return false;
-                    const parts = o.timestamp.split('/')[0].split('.');
-                    if (parts.length < 3) return false;
-                    const d = new Date(2000 + parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                }).length;
-                document.getElementById('stat-active').textContent = active;
-                document.getElementById('stat-done').textContent   = done;
-                document.getElementById('stat-month').textContent  = month;
+        function showPage(id) {
+            document.querySelectorAll('.page-section').forEach(p => { p.classList.add('hidden'); });
+            const targetPage = document.getElementById(id);
+            targetPage.classList.remove('hidden');
+            window.scrollTo(0, 0);
+            if (tg?.BackButton) {
+                id !== 'page-1' ? tg.BackButton.show() : tg.BackButton.hide();
             }
-        }).catch(() => {});
-    }
+            currentPageId = id;
+            lucide.createIcons();
+        }
 
-    function loadMenuStats() {
-        const phone = localStorage.getItem('phone');
-        if (!phone) return;
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_content_requests', phone, telegram_id: TELEGRAM_ID }),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            redirect: 'follow'
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.status === 'success' && data.orders) {
-                document.getElementById('menu-stat-active').textContent  = data.orders.filter(o => o.status === 'Активна').length;
-                document.getElementById('menu-stat-cancel').textContent  = data.orders.filter(o => o.status === 'Скасована').length;
-                document.getElementById('menu-stat-completed').textContent = data.orders.filter(o => o.status === 'Виконані').length;
-                document.getElementById('menu-stat-archive').textContent = data.orders.filter(o => o.status === 'Архів').length;
+        function startNewRequest() {
+            if (localStorage.getItem('fio')) showPage('page-3');
+            else showPage('page-2');
+        }
+
+        function saveProfile() {
+            const fio = document.getElementById('user-fio').value.trim();
+            const phone = document.getElementById('user-phone').value.trim();
+            if(!fio || !phone) { alert("⚠️ Будь ласка, заповніть поля!"); return; }
+            localStorage.setItem('fio', fio);
+            localStorage.setItem('phone', phone);
+            showPage('page-3');
+        }
+
+        function goToPage3b() {
+            const fields = [
+                { id: 'department',       check: el => el.value.trim() },
+                { id: 'manager-fio',      check: el => el.value.trim() },
+                { id: 'manager-approved', check: el => el.value },
+            ];
+            if (!markErrors(fields)) { alert("⚠️ Заповніть всі поля та оберіть варіант погодження!"); return; }
+            showPage('page-3b');
+        }
+
+        function goToPage4() {
+            const fields = [
+                { id: 'job-title',         check: el => el.value.trim() },
+                { id: 'vacancies-count',   check: el => el.value.trim() },
+                { id: 'subordinates-count',check: el => el.value },
+                { id: 'job-functions',     check: el => el.value.trim() },
+            ];
+            if (!markErrors(fields)) { alert("⚠️ Вкажіть назву посади, кількість вакансій, підлеглих та обов'язки!"); return; }
+            showPage('page-4');
+        }
+
+        function goToPage5() {
+            const fields = [
+                { id: 'search-reason',     check: el => el.value },
+                { id: 'priority',          check: el => el.value },
+                { id: 'salary-probation',  check: el => el.value.trim() },
+                { id: 'salary-after',      check: el => el.value.trim() },
+                { id: 'probation-duration',check: el => el.value },
+            ];
+            if (!markErrors(fields)) { alert("⚠️ Оберіть причину, пріоритет, термін та вкажіть умови заробітної плати!"); return; }
+            showPage('page-5');
+        }
+
+        function goToPage5b() {
+            const fields = [
+                { id: 'candidate-age-from',  check: el => el.value },
+                { id: 'candidate-age-to',    check: el => el.value },
+                { id: 'candidate-education', check: el => el.value },
+                { id: 'candidate-specialty', check: el => el.value.trim() },
+            ];
+            if (!markErrors(fields)) { alert("⚠️ Оберіть вік, рівень освіти та вкажіть спеціальність!"); return; }
+            const fromAge = parseInt(document.getElementById('candidate-age-from').value);
+            const toAge = parseInt(document.getElementById('candidate-age-to').value);
+            if (toAge < fromAge) {
+                ['candidate-age-from','candidate-age-to'].forEach(id => flashError(document.getElementById(id)));
+                alert("⚠️ Помилка: Вік 'до' не може бути меншим за вік 'від'!"); return;
             }
-        }).catch(() => {});
-    }
+            showPage('page-5b');
+        }
 
-    // Phone mask
-    function applyPhoneMask(e) {
-        const el = e.target;
-        let digits = el.value.replace(/\D/g, '');
-        if (digits.startsWith('380')) digits = digits.slice(2);
-        else if (digits.startsWith('38')) digits = digits.slice(2);
-        if (digits.length > 10) digits = digits.substring(0, 10);
-        digits = digits.replace(/^0/, '');
-        const local = digits;
-        let result = '38';
-        if (local.length > 0) result += ' 0' + local.substring(0, 2);
-        if (local.length >= 3) result += ' ' + local.substring(2, 5);
-        if (local.length >= 6) result += ' ' + local.substring(5, 7);
-        if (local.length >= 8) result += ' ' + local.substring(7, 9);
-        el.value = result.trim();
-        el.classList.remove('error-input');
-    }
+        function goToPage5c() {
+            const fields = [{ id: 'candidate-experience', check: el => el.value.trim() }];
+            if (!markErrors(fields)) { alert("⚠️ Заповніть вимоги щодо досвіду роботи!"); return; }
+            showPage('page-5c');
+        }
 
-    function initPhoneField(el) {
-        el.addEventListener('focus', function() {
-            if (!this.value || this.value.trim() === '') {
-                this.value = '38 0';
-                setTimeout(() => { this.selectionStart = this.selectionEnd = this.value.length; }, 0);
+        function goToPage6() {
+            const fields = [{ id: 'candidate-skills', check: el => el.value.trim() }];
+            if (!markErrors(fields)) { alert("⚠️ Заповніть поле професійних знань та вмінь!"); return; }
+            showPage('page-6');
+        }
+
+        function goToPage6b() {
+            const langRows = document.querySelectorAll('#languages-container > div');
+            let valid = true;
+            let count = 0;
+
+            langRows.forEach(row => {
+                const langSel = row.querySelector('.lang-select-val');
+                const lvlSel  = row.querySelector('.level-select-val');
+                if(!langSel.value || !lvlSel.value) {
+                    valid = false;
+                    flashError(langSel); flashError(lvlSel);
+                }
+                count++;
+            });
+
+            if(count === 0) {
+                alert("⚠️ Додайте хоча б одну мову та рівень володіння через кнопку + !"); return;
             }
+            if(!valid) {
+                alert("⚠️ Будь ласка, заповніть обрані мови та рівні або видаліть порожній рядок!"); return;
+            }
+
+            const pcEl = document.getElementById('candidate-pc');
+            if(!pcEl.value) {
+                flashError(pcEl);
+                alert("⚠️ Оберіть рівень володіння ПК!"); return;
+            }
+
+            const needProgEl = document.getElementById('need-programs');
+            if(!needProgEl.value) {
+                flashError(needProgEl);
+                alert("⚠️ Вкажіть чи потрібні спеціалізовані програми!"); return;
+            }
+            if(needProgEl.value === 'yes' && !document.getElementById('custom-programs').value.trim()) {
+                flashError(document.getElementById('custom-programs'));
+                alert("⚠️ Вкажіть назви спеціалізованих програм!"); return;
+            }
+
+            showPage('page-6b');
+        }
+
+        function goToPage7() {
+            const fields = [{ id: 'candidate-traits', check: el => el.value.trim() }];
+            if (!markErrors(fields)) { alert("⚠️ Опишіть особисті якості кандидата!"); return; }
+            showPage('page-7');
+        }
+
+        function renderSummary() {
+            if(!document.getElementById('contact-fio').value.trim() || !document.getElementById('contact-phone').value.trim()) {
+                alert("⚠️ Вкажіть контактну особу та її номер телефону!"); return;
+            }
+
+            const emailField = document.getElementById('contact-email');
+            const emailValue = emailField.value.trim();
+            if (emailValue !== "") {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailValue)) {
+                    alert("⚠️ Помилка: Якщо ви заповнюєте поле E-mail, воно повинно бути справжньою адресою пошти з символом @ та доменом (наприклад: name@company.com)!");
+                    emailField.classList.add('error-input');
+                    return;
+                }
+            }
+            emailField.classList.remove('error-input');
+
+            document.getElementById('sum-dept').innerText = document.getElementById('department').value;
+            document.getElementById('sum-manager').innerText = document.getElementById('manager-fio').value;
+            document.getElementById('sum-approved').innerText = document.getElementById('manager-approved').value;
+
+            document.getElementById('sum-title').innerText = document.getElementById('job-title').value;
+            document.getElementById('sum-v-count').innerText = document.getElementById('vacancies-count').value || "1";
+            document.getElementById('sum-sub-count').innerText = document.getElementById('subordinates-count').value;
+            document.getElementById('sum-functions').innerText = document.getElementById('job-functions').value;
+
+            document.getElementById('sum-reason').innerText = document.getElementById('search-reason').value;
+
+            const prioSelect = document.getElementById('priority');
+            document.getElementById('sum-prio').innerText = prioSelect ? prioSelect.value : document.getElementById('priority-value').value;
+
+            document.getElementById('sum-sal-prob').innerText = document.getElementById('salary-probation').value + " ₴";
+            document.getElementById('sum-sal-after').innerText = document.getElementById('salary-after').value + " ₴";
+            document.getElementById('sum-prob-dur').innerText = document.getElementById('probation-duration').value;
+
+            const fromAge = document.getElementById('candidate-age-from').value;
+            const toAge = document.getElementById('candidate-age-to').value;
+            document.getElementById('sum-age').innerText = `від ${fromAge} до ${toAge} років`;
+
+            document.getElementById('sum-edu').innerText = document.getElementById('candidate-education').value;
+            document.getElementById('sum-specialty').innerText = document.getElementById('candidate-specialty').value;
+            document.getElementById('sum-exp').innerText = document.getElementById('candidate-experience').value;
+            document.getElementById('sum-skills').innerText = document.getElementById('candidate-skills').value;
+
+            const langRows = document.querySelectorAll('#languages-container > div');
+            let summaryLangLevels = [];
+            langRows.forEach(row => {
+                const langVal = row.querySelector('.lang-select-val').value;
+                const levelVal = row.querySelector('.level-select-val').value;
+                if(langVal && levelVal) {
+                    summaryLangLevels.push(`${langVal} (${levelVal.split(' - ')[0]})`);
+                }
+            });
+            document.getElementById('sum-lang-levels').innerText = summaryLangLevels.join(', ') || "Не вказано";
+
+            document.getElementById('sum-pc').innerText = document.getElementById('candidate-pc').value;
+
+            const needProgs = document.getElementById('need-programs').value;
+            const customProgs = document.getElementById('custom-programs').value.trim();
+            document.getElementById('sum-programs').innerText = needProgs === 'yes' ? (customProgs || '—') : 'Не потрібні';
+
+            document.getElementById('sum-traits').innerText = document.getElementById('candidate-traits').value;
+
+            document.getElementById('sum-c-fio').innerText = document.getElementById('contact-fio').value;
+            document.getElementById('sum-c-contacts').innerText = document.getElementById('contact-phone').value + " | " + (document.getElementById('contact-email').value || "немає");
+
+            showPage('page-8');
+        }
+
+        // Helpers
+        function flashError(el) {
+            el.classList.remove('error-input');
+            void el.offsetWidth; // reflow to restart animation
+            el.classList.add('error-input');
+        }
+
+        function markErrors(fields) {
+            let allOk = true;
+            fields.forEach(({ id, check }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (!check(el)) { flashError(el); allOk = false; }
+                else el.classList.remove('error-input');
+            });
+            return allOk;
+        }
+
+        function toggleProgramsField(sel) {
+            const wrap = document.getElementById('custom-programs-wrap');
+            if (sel.value === 'yes') {
+                wrap.classList.remove('hidden');
+                setTimeout(() => document.getElementById('custom-programs').focus(), 100);
+            } else {
+                wrap.classList.add('hidden');
+                document.getElementById('custom-programs').value = '';
+            }
+        }
+
+        function lettersOnly(el) {
+            // Allow: letters (Cyrillic/Latin), spaces, apostrophe, hyphen, comma, dot
+            el.value = el.value.replace(/[^а-яА-ЯіІїЇєЄa-zA-Z\s'\-,.]/g, '');
+        }
+
+        function digitsOnly(el) {
+            el.value = el.value.replace(/\D/g, '');
+        }
+
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('input', () => el.classList.remove('error-input'));
+            el.addEventListener('change', () => el.classList.remove('error-input'));
         });
-        el.addEventListener('keydown', function(e) {
-            if ((e.key === 'Backspace' || e.key === 'Delete') && this.value.length <= 4) e.preventDefault();
-        });
-        el.addEventListener('input', applyPhoneMask);
-        el.setAttribute('maxlength', '18');
-    }
 
-    initPhoneField(document.getElementById('user-phone'));
+        function fakeSubmit() {
+            showPage('page-success');
+        }
 
-    document.querySelectorAll('input, select, textarea').forEach(el => {
-        el.addEventListener('input',  function() { this.classList.remove('error-input'); });
-        el.addEventListener('change', function() { this.classList.remove('error-input'); });
-    });
+        function applyPhoneMask(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.startsWith('38')) val = val.slice(2);
+            if (val.length > 10) val = val.substring(0, 10);
+            let res = '38';
+            if (val.length > 0) res += ' ' + val.substring(0, 3);
+            if (val.length >= 4) res += ' ' + val.substring(3, 6);
+            if (val.length >= 7) res += ' ' + val.substring(6, 8);
+            if (val.length >= 9) res += ' ' + val.substring(8, 10);
+            e.target.value = res.trim();
+        }
 
-    if (tg) tg.ready();
-    updateBackButton('page-1');
-    loadHomeStats();
-</script>
+        document.getElementById('user-phone').addEventListener('input', applyPhoneMask);
+        document.getElementById('contact-phone').addEventListener('input', applyPhoneMask);
+
+        if(localStorage.getItem('fio')) {
+            document.getElementById('user-fio').value = localStorage.getItem('fio');
+            document.getElementById('user-phone').value = localStorage.getItem('phone');
+        }
+    </script>
 </body>
 </html>
